@@ -28,9 +28,7 @@ export const FEEDS = [
 
   // ---------- Administración, empresas, marketing y tecnología ----------
   // (además, la app clasifica en «Administración» las notas de empresas, gestión, marketing y MYPE de las otras secciones)
-  { sec: 'adm',   name: 'Gestión',       url: 'https://gestion.pe/arcio/rss/category/economia/empresas/' },
-  { sec: 'adm',   name: 'Gestión',       url: 'https://gestion.pe/arcio/rss/category/economia/management-empleo/' },
-  { sec: 'adm',   name: 'Mercado Negro', url: 'https://www.mercadonegro.pe/feed/' }
+  { sec: 'eco',   name: 'Gestión',       url: 'https://gestion.pe/arcio/rss/' }
 ];
 
 // Secciones de las URL que no interesan (deporte, espectáculos, etc.)

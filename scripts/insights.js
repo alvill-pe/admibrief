@@ -52,7 +52,7 @@
       area: 'Emprendimiento', pestel: 'Económico', concept: 'Gestión de MYPE', w: 3,
       note: 'Las MYPE son la mayor fuente de empleo en el Perú. Financiamiento, formalización y productividad son sus retos centrales.',
       q: '¿Qué le recomendarías a una MYPE de tu ciudad a partir de esta noticia?' },
-    { k: ['liderazgo', 'lider', 'management', 'gerente', 'ceo$', 'cultura organizacional', 'productividad', 'equipo de trabajo', 'gestion del cambio', 'toma de decisiones', 'trabajo remoto', 'teletrabajo'],
+    { k: ['liderazgo', 'lider$', 'lideres$', 'management', 'gerente', 'ceo$', 'cultura organizacional', 'productividad', 'equipo de trabajo', 'gestion del cambio', 'toma de decisiones', 'trabajo remoto', 'teletrabajo'],
       area: 'Dirección', pestel: 'Social', concept: 'Liderazgo y comportamiento organizacional', w: 3,
       note: 'Cómo se dirige a las personas define resultados. Aquí hay una lección práctica de dirección que puedes aplicar en equipos de trabajo.',
       q: '¿Qué harías distinto si fueras el gerente en esta situación?' },

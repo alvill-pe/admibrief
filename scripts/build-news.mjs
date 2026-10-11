@@ -31,7 +31,7 @@ const NOW = Date.now();
 const HOUR = 3.6e6;
 const MAX_AGE_H = { peru: 36, pol: 36, eco: 48, world: 36, adm: 120 };
 const MAX_ITEMS = 220;
-const DATA_VERSION = 4; // si cambian las reglas, se descartan los datos anteriores
+const DATA_VERSION = 5; // si cambian las reglas, se descartan los datos anteriores
 
 // Motor de reglas compartido con la app
 vm.runInThisContext(fs.readFileSync(path.join(ROOT, 'scripts', 'insights.js'), 'utf8'));
@@ -268,7 +268,7 @@ ${fullText.slice(0, 7000)}`;
 // ---------------------------------------------------------------- agrupación y relevancia
 const ADM_AREAS = new Set(['Dirección', 'Emprendimiento', 'Marketing', 'Innovación y TI', 'Operaciones y logística', 'Gobierno corporativo', 'Responsabilidad social', 'Recursos Humanos', 'Finanzas corporativas', 'Evaluación de proyectos']);
 const ADM_URL = /\/(empresas|management|emprendimiento|negocios|marketing|tecnologia|innovacion|publicidad|branding|retail|startups?|mypes?)\//i;
-const ADM_TITLE = /\b(CEO|gerente|empresa|empresas|compañía|marca|emprend|mype|pyme|startup|inversión de|negocio|liderazgo|ventas|retail|consumidor|campaña)\b/i;
+const ADM_TITLE = /(\bCEO\b|gerente|empresa|compañía|\bmarcas?\b|emprend|\bmypes?\b|\bpymes?\b|startup|invierte|inversión de|negocio|liderazgo|ventas|retail|consumidor|exportador|mercado laboral|empleo|trabajadores|restaurantes|tiendas|banco|financier)/i;
 
 const tokSet = (t) => new Set(words(t).filter((w) => w.length > 3));
 const storyToks = (i) => new Set([...words(i.title), ...words(((i.summary && i.summary[0]) || '').split(' ').slice(0, 35).join(' '))].filter((w) => w.length > 3));
@@ -339,10 +339,10 @@ async function main() {
     const full = paras.filter((p) => !p.h).map((p) => p.t).join('\n');
     if (ex.paragraphs.join(' ').split(' ').length < 60) return; // demasiado corto para entenderse sin abrir la nota
     const ins = analyzeNews(r.title, full.slice(0, 700));
-    const tIns = analyzeNews(r.title, '');
+    const tIns = analyzeNews(r.title, full.slice(0, 300));
     let s2 = secs.slice();
     const noAdm = /(asesin|homicid|criminal|sicari|muert|fallec|terremoto|sismo|tembl|incendio|huracán|accidente|elecciones|ONPE|JNE)/i.test(r.title);
-    if (!s2.includes('adm') && !noAdm && (ADM_URL.test(r.link) || ADM_AREAS.has(tIns.area) || (ADM_TITLE.test(r.title) && (secs.includes('eco') || secs.includes('peru'))))) s2.push('adm');
+    if (!s2.includes('adm') && !noAdm && (ADM_URL.test(r.link) || ((secs.includes('eco') || secs.includes('peru')) && ((ADM_AREAS.has(tIns.area) && tIns.score >= 3) || ADM_TITLE.test(r.title))))) s2.push('adm');
     fresh.push({
       id, title: r.title, link: r.link, source: r.feed.name.replace(/ Tecnología$/, ''), secs: s2, sec: secs[0], date,
       img: /^https:\/\//.test(img || '') ? img : '',
