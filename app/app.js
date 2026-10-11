@@ -25,14 +25,15 @@
 
   const SECTIONS = [
     { id: 'top', label: 'Destacado' }, { id: 'peru', label: 'Perú' }, { id: 'pol', label: 'Política' },
-    { id: 'eco', label: 'Economía' }, { id: 'world', label: 'Mundo' }, { id: 'salud', label: 'Salud' }
+    { id: 'eco', label: 'Economía' }, { id: 'biz', label: 'Negocios' }, { id: 'world', label: 'Mundo' }, { id: 'salud', label: 'Salud' }
   ];
   const secLabel = (id) => (SECTIONS.find((s) => s.id === id) || {}).label || (id === 'adm' ? 'Economía' : 'Noticia');
   const DATA_KEY = 'ab2_data', SAVED_KEY = 'ab2_saved', FONT_KEY = 'ab2_font', SEC_KEY = 'ab2_sec';
   const REFRESH_MS = 5 * 60 * 1000;
   const SEEN_KEY = 'ab2_seen', NOTIF_KEY = 'ab2_notif', MODE_KEY = 'ab2_mode', DAYS_KEY = 'ab2_days', BEST_KEY = 'ab2_best';
   const coarse = window.matchMedia('(pointer: coarse)');
-  const desktop = window.matchMedia('(min-width: 1000px)');
+  // Estilo diario: la nota se abre como página completa también en la PC (no hay panel lateral)
+  const desktop = { matches: false };
 
   const state = {
     data: store.get(DATA_KEY, null), fetchedAt: 0, loading: false,
@@ -174,18 +175,18 @@
 
   function cardHTML(i, idx, opts) {
     const big = opts && opts.big;
-    const rank = opts && opts.rank ? '<span class="rank">' + String(opts.rank).padStart(2, '0') + '</span>' : '';
     const sec = (i.secs && i.secs[0]) || i.sec;
     const isNew = state.newIds.has(i.group || i.id) ? '<span class="new-tag">Nueva</span>' : '';
-    const also = i.also && i.also.length ? '<span class="cov">+' + i.also.length + ' medios</span>' : '';
+    const en = i.lang === 'en' ? '<span class="lang-tag" title="Nota en inglés">EN</span>' : '';
+    const also = i.also && i.also.length ? '<span class="dot">·</span><span class="cov">+' + i.also.length + ' medios</span>' : '';
     const img = i.img ? '<div class="thumb"><img loading="lazy" referrerpolicy="no-referrer" src="' + esc(i.img) + '" alt="" onerror="this.parentNode.remove()"></div>' : '';
     return '<article class="card' + (big ? ' big' : '') + (i.id === state.openId ? ' current' : '') + '" data-id="' + i.id + '" tabindex="0" role="button" aria-label="' + esc(i.title) + '">' +
       (big ? img : '') +
       '<div class="card-main">' +
-        '<div class="meta">' + rank + '<span class="sec sec-' + sec + '">' + esc(secLabel(sec)) + '</span>' + isNew + '<span class="src">' + esc(i.source) + '</span><span class="dot">·</span><time>' + timeAgo(i.date) + '</time></div>' +
+        '<div class="kicker"><span class="sec sec-' + sec + '">' + esc(secLabel(sec)) + '</span>' + isNew + en + '</div>' +
         '<h3 class="title">' + esc(i.title) + '</h3>' +
         '<p class="lead">' + esc(lead(i)) + '</p>' +
-        '<div class="card-foot"><span class="concept"><i></i>' + esc(i.admin ? i.admin.concept : '') + '</span>' + also +
+        '<div class="meta"><span class="src">' + esc(i.source) + '</span><span class="dot">·</span><time>' + timeAgo(i.date) + '</time>' + also +
           (state.saved[i.id] ? '<span class="saved-mark" aria-label="Guardada">★</span>' : '') + '</div>' +
       '</div>' + (big ? '' : img) +
     '</article>';
@@ -200,8 +201,8 @@
       return;
     }
     const isTop = state.section === 'top' && !state.query;
-    let html = isTop ? '<div class="lead-label">Lo más relevante hoy</div>' : '';
-    html += state.list.slice(0, state.limit).map((i, k) => cardHTML(i, k, isTop ? { big: k === 0, rank: k < 10 ? k + 1 : 0 } : null)).join('');
+    let html = '<h2 class="lead-label">' + (state.query ? 'Resultados' : isTop ? 'Lo más relevante hoy' : esc(secLabel(state.section))) + '</h2>';
+    html += state.list.slice(0, state.limit).map((i, k) => cardHTML(i, k, k === 0 && !state.query ? { big: true } : null)).join('');
     if (state.list.length > state.limit) html += '<button class="btn-more" id="btnMore">Ver más noticias (' + (state.list.length - state.limit) + ')</button>';
     feed.innerHTML = html;
   }
@@ -366,7 +367,7 @@
     const next = idx >= 0 ? state.list[idx + 1] : null;
     const exec = state.mode === 'exec';
     let h = modeSwitch() +
-      '<div class="meta"><span class="sec sec-' + sec + '">' + esc(secLabel(sec)) + '</span><span class="src">' + esc(i.source) + '</span><span class="dot">·</span><time title="' + esc(fullDate(i.date)) + '">' + timeAgo(i.date) + '</time></div>' +
+      '<div class="meta"><span class="sec sec-' + sec + '">' + esc(secLabel(sec)) + '</span><span class="src">' + esc(i.source) + '</span><span class="dot">·</span><time title="' + esc(fullDate(i.date)) + '">' + timeAgo(i.date) + '</time>' + (i.lang === 'en' ? '<span class="lang-tag">EN</span>' : '') + '</div>' +
       '<h1 class="rd-title">' + esc(i.title) + '</h1>';
 
     if (!exec) {
@@ -399,6 +400,7 @@
       }
       h += '<details class="rd-more"><summary>Leer el resumen completo</summary>' + (i.summary || []).map((p) => '<p>' + esc(p) + '</p>').join('') + '</details>';
     }
+    if (i.brief) h += '<p class="rd-brief">' + esc(i.source) + ' solo publica un adelanto de esta nota' + (i.lang === 'en' ? ' (en inglés)' : '') + '. Para el análisis completo, ábrela en la fuente original.</p>';
     h += (i.also && i.also.length ? '<p class="rd-also">También informaron: ' + i.also.map(esc).join(', ') + '.</p>' : '') +
       '<a class="btn-source" href="' + esc(i.link) + '" target="_blank" rel="noopener">Leer la nota completa en ' + esc(i.source) +
         '<svg viewBox="0 0 24 24" width="17" height="17"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></a>' +
@@ -559,31 +561,32 @@
     const W = 1080, H = 1080, P = 84; const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
     const SERIF = '"Source Serif 4", Georgia, serif', SANS = '"IBM Plex Sans", "Segoe UI", Arial, sans-serif';
     try { await Promise.all([document.fonts.load('700 60px "Source Serif 4"'), document.fonts.load('600 30px "IBM Plex Sans"')]); } catch (e) {}
-    const g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#0B1F3A'); g.addColorStop(1, '#16305A'); x.fillStyle = g; x.fillRect(0, 0, W, H);
-    x.fillStyle = '#2F6FDF'; x.fillRect(0, 0, W, 14);
+    x.fillStyle = '#FFF1E5'; x.fillRect(0, 0, W, H);
+    x.fillStyle = '#990F3D'; x.fillRect(0, 0, W, 16);
+    x.fillStyle = '#262A33'; x.fillRect(P, 176, W - 2 * P, 3);
     const logo = await loadImg('icons/icon-192.png');
     if (logo) x.drawImage(logo, P, 74, 72, 72);
-    x.fillStyle = '#FFFFFF'; x.font = '700 40px ' + SERIF; x.fillText('AdmiBrief', P + 92, 116);
-    x.fillStyle = '#9FB3D1'; x.font = '500 24px ' + SANS; x.fillText(new Date().toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }), P + 92, 146);
+    x.fillStyle = '#262A33'; x.font = '700 44px ' + SERIF; x.fillText('AdmiBrief', P + 92, 118);
+    x.fillStyle = '#7A726C'; x.font = '500 24px ' + SANS; x.fillText(new Date().toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }), P + 92, 146);
     let y = 262;
-    x.fillStyle = '#7AA8F7'; x.font = '700 28px ' + SANS; x.fillText(f.label.toUpperCase() + (f.extra ? '  ·  ' + f.extra.toUpperCase() : ''), P, y);
+    x.fillStyle = '#990F3D'; x.font = '700 28px ' + SANS; x.fillText(f.label.toUpperCase() + (f.extra ? '  ·  ' + f.extra.toUpperCase() : ''), P, y);
     y += 30;
     if (f.big) {
-      x.fillStyle = '#FFFFFF'; x.font = '700 150px ' + SERIF; y += 140; x.fillText(f.big, P, y);
-      if (f.chg) { x.fillStyle = f.dir === 'up' ? '#6FD59A' : f.dir === 'down' ? '#FF8A80' : '#B9C4D6'; x.font = '700 44px ' + SANS; y += 72; x.fillText(f.chg, P, y); }
+      x.fillStyle = '#262A33'; x.font = '600 150px ' + SERIF; y += 140; x.fillText(f.big, P, y);
+      if (f.chg) { x.fillStyle = f.dir === 'up' ? '#0A7C47' : f.dir === 'down' ? '#C8102E' : '#7A726C'; x.font = '700 44px ' + SANS; y += 72; x.fillText(f.chg, P, y); }
       y += 40;
     }
     const main = f.kind === 'dato' || f.kind === 'news' ? f.title : '«' + (f.quote.length > 420 ? f.quote.slice(0, 418).replace(/\s+\S*$/, '') + '…' : f.quote) + '»';
     const bottom = H - 210; let size = 66, lines, lh;
     for (; size >= 30; size -= 2) { x.font = '600 ' + size + 'px ' + SERIF; lh = Math.round(size * 1.28); lines = wrapLines(x, main, W - 2 * P); if (y + lines.length * lh + 20 <= bottom) break; }
-    x.fillStyle = '#FFFFFF'; y += 20;
+    x.fillStyle = '#262A33'; y += 20;
     lines.forEach((l) => { y += lh; x.fillText(l, P, y - 12); });
-    x.fillStyle = 'rgba(255,255,255,.16)'; x.fillRect(P, H - 168, W - 2 * P, 2);
-    x.fillStyle = '#C9D4E6'; x.font = '500 27px ' + SANS;
+    x.fillStyle = '#E0D0C2'; x.fillRect(P, H - 168, W - 2 * P, 2);
+    x.fillStyle = '#4D4845'; x.font = '500 27px ' + SANS;
     let foot = f.kind === 'dato' ? 'Fuente: Banco Central de Reserva del Perú (BCRP)' : f.kind === 'news' ? 'Fuente: ' + f.source : 'Fuente: ' + f.source + ' · ' + f.title;
     while (x.measureText(foot).width > W - 2 * P && foot.length > 20) foot = foot.slice(0, -2).replace(/\s*\S*$/, '') + '…';
     x.fillText(foot, P, H - 116);
-    x.fillStyle = '#7AA8F7'; x.font = '600 27px ' + SANS; x.fillText('Lee más en AdmiBrief · ' + APP_URL().replace(/^https?:\/\//, '').replace(/\/$/, ''), P, H - 74);
+    x.fillStyle = '#0D7680'; x.font = '600 27px ' + SANS; x.fillText('Lee más en AdmiBrief · ' + APP_URL().replace(/^https?:\/\//, '').replace(/\/$/, ''), P, H - 74);
     return c;
   }
   async function openShare(kind) {
