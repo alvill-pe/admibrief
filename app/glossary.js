@@ -1,4 +1,4 @@
-/* Glosario de AdmiBrief para el «Modo Estudiante».
+/* Glosario de Pulso Empresarial para el «Modo Estudiante».
    k: variantes (expresión regular, sin límites de palabra); cs: distingue mayúsculas (siglas). */
 window.AB_GLOSSARY = [
   // ---------- Finanzas de la empresa

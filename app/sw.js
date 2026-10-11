@@ -1,6 +1,6 @@
-/* AdmiBrief service worker: siempre intenta la versión más reciente y, sin conexión,
+/* Pulso Empresarial service worker: siempre intenta la versión más reciente y, sin conexión,
    abre lo último guardado. */
-const CACHE = 'admibrief-v12';
+const CACHE = 'pulso-v13';
 const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'glossary.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 
@@ -46,7 +46,7 @@ async function checkNews() {
   const fresh = (d.top || []).map((id) => d.items.find((i) => i.id === id)).filter((i) => i && !seen.has(i.group || i.id));
   if (fresh.length) {
     const f = fresh[0];
-    await self.registration.showNotification('AdmiBrief', { body: f.title + (fresh.length > 1 ? ' (+' + (fresh.length - 1) + ' destacadas más)' : ''), icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', tag: 'admibrief', renotify: true, data: { id: f.id } });
+    await self.registration.showNotification('Pulso Empresarial', { body: f.title + (fresh.length > 1 ? ' (+' + (fresh.length - 1) + ' destacadas más)' : ''), icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', tag: 'admibrief', renotify: true, data: { id: f.id } });
   }
   await setMeta({ on: true, seen: d.items.map((i) => i.group || i.id).slice(0, 400) });
 }

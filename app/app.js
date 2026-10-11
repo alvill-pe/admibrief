@@ -1,4 +1,4 @@
-/* AdmiBrief — app (sin frameworks). Lee news.json, que se regenera cada hora en GitHub Actions. */
+/* Pulso Empresarial — app (sin frameworks). Lee news.json, que se regenera cada hora en GitHub Actions. */
 (function () {
   'use strict';
 
@@ -90,7 +90,7 @@
     if (!top.length) return;
     const first = top[0];
     const more = top.length > 1 ? ' (+' + (top.length - 1) + ' destacadas más)' : '';
-    showNote('AdmiBrief · ' + secLabel((first.secs && first.secs[0]) || first.sec), first.title + more, first.id);
+    showNote('Pulso Empresarial · ' + secLabel((first.secs && first.secs[0]) || first.sec), first.title + more, first.id);
   }
   const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
   const detectOS = () => {
@@ -128,7 +128,7 @@
     if (perm !== 'granted') { try { perm = await Notification.requestPermission(); } catch (e) {} }
     if (perm === 'granted') {
       store.set(NOTIF_KEY, true); toast('Notificaciones activadas'); registerPeriodic(); syncSW();
-      showNote('AdmiBrief', 'Listo. Te avisaremos de las noticias más relevantes.', '', 'welcome');
+      showNote('Pulso Empresarial', 'Listo. Te avisaremos de las noticias más relevantes.', '', 'welcome');
     }
     renderNotif();
   }
@@ -375,7 +375,7 @@
       h += (i.img ? '<figure class="rd-img"><img referrerpolicy="no-referrer" src="' + esc(i.img) + '" alt="" onerror="this.parentNode.remove()"></figure>' : '') +
         '<section class="rd-section"><h2 class="rd-h">Resumen</h2>' + (i.summary || []).map((p) => '<p>' + glossify(p, used) + '</p>').join('') + '</section>' +
         (i.points && i.points.length ? '<section class="rd-section"><h2 class="rd-h">Datos clave</h2><ul class="rd-points">' + i.points.map((p, k) => '<li><span>' + glossify(p, used) + '</span>' + shareBtn('point:' + k, 'Compartir este dato') + '</li>').join('') + '</ul></section>' : '') +
-        '<section class="rd-admin"><div class="ins-top"><div class="ins-kicker">Clave para el administrador</div>' + shareBtn('admin', 'Compartir la clave para el administrador') + '</div>' +
+        '<section class="rd-admin"><div class="ins-top"><div class="ins-kicker">Clave de negocio</div>' + shareBtn('admin', 'Compartir la clave de negocio') + '</div>' +
           '<div class="rd-admin-head"><span class="ins-concept">' + esc(a.concept) + '</span><span class="chip">' + esc(a.area) + '</span>' + (a.pestel ? '<span class="chip ghost">PESTEL: ' + esc(a.pestel) + '</span>' : '') + '</div>' +
           '<p>' + esc(a.note) + '</p>' + (a.q ? '<p class="ins-q"><b>Para pensar:</b> ' + esc(a.q) + '</p>' : '') +
         '</section>';
@@ -506,7 +506,7 @@
       '</section>';
     }
     const msg = s.n === 0 ? 'Empieza tu racha: lee una noticia hoy.'
-      : s.today ? 'Llevas <b>' + s.n + (s.n === 1 ? ' día' : ' días seguidos') + '</b> leyendo AdmiBrief.'
+      : s.today ? 'Llevas <b>' + s.n + (s.n === 1 ? ' día' : ' días seguidos') + '</b> leyendo Pulso Empresarial.'
       : 'Llevas <b>' + s.n + (s.n === 1 ? ' día' : ' días seguidos') + '</b>. Lee una noticia hoy para no perder tu racha.';
     h += '<div class="streak' + (s.today ? ' done' : '') + '"><span class="flame" aria-hidden="true">' + (s.n ? '🔥' : '📖') + '</span>' +
       '<div class="streak-txt"><span>' + msg + '</span>' + (s.best > 1 ? '<small>Mejor racha: ' + s.best + ' días</small>' : '') + '</div>' +
@@ -525,7 +525,7 @@
     const i = byId(state.openId); if (!i) return null;
     const base = { kind, title: i.title, source: i.source, link: i.link };
     if (kind === 'news') return Object.assign(base, { label: 'Noticia', quote: lead(i) });
-    if (kind === 'admin') return Object.assign(base, { label: state.mode === 'exec' ? 'Implicancia estratégica' : 'Clave para el administrador', quote: (i.admin || {}).note || '', extra: (i.admin || {}).concept });
+    if (kind === 'admin') return Object.assign(base, { label: state.mode === 'exec' ? 'Implicancia estratégica' : 'Clave de negocio', quote: (i.admin || {}).note || '', extra: (i.admin || {}).concept });
     if (kind.indexOf('point:') === 0) return Object.assign(base, { label: 'Dato clave', quote: (i.points || [])[+kind.slice(6)] || '' });
     if (kind.indexOf('para:') === 0) return Object.assign(base, { label: 'Resumen', quote: (i.summary || [])[+kind.slice(5)] || '' });
     if (kind === 'sel') return Object.assign(base, { label: 'Fragmento', quote: state.selText });
@@ -541,8 +541,8 @@
       L.push(net === 'slack' ? '> ' + f.quote : '«' + f.quote + '»');
       L.push('', 'Noticia: ' + f.title + ' (' + f.source + ')', f.link);
     }
-    L.push('', 'Vía AdmiBrief: ' + APP_URL());
-    if (net === 'li') L.push('', '#Administración #Economía #Perú #Negocios');
+    L.push('', 'Vía Pulso Empresarial: ' + APP_URL());
+    if (net === 'li') L.push('', '#Negocios #Economía #Política #Perú');
     return L.join('\n');
   }
   async function copyText(t) {
@@ -566,7 +566,7 @@
     x.fillStyle = '#262A33'; x.fillRect(P, 176, W - 2 * P, 3);
     const logo = await loadImg('icons/icon-192.png');
     if (logo) x.drawImage(logo, P, 74, 72, 72);
-    x.fillStyle = '#262A33'; x.font = '700 44px ' + SERIF; x.fillText('AdmiBrief', P + 92, 118);
+    x.fillStyle = '#262A33'; x.font = '700 44px ' + SERIF; x.fillText('Pulso Empresarial', P + 92, 118);
     x.fillStyle = '#7A726C'; x.font = '500 24px ' + SANS; x.fillText(new Date().toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }), P + 92, 146);
     let y = 262;
     x.fillStyle = '#990F3D'; x.font = '700 28px ' + SANS; x.fillText(f.label.toUpperCase() + (f.extra ? '  ·  ' + f.extra.toUpperCase() : ''), P, y);
@@ -586,7 +586,7 @@
     let foot = f.kind === 'dato' ? 'Fuente: Banco Central de Reserva del Perú (BCRP)' : f.kind === 'news' ? 'Fuente: ' + f.source : 'Fuente: ' + f.source + ' · ' + f.title;
     while (x.measureText(foot).width > W - 2 * P && foot.length > 20) foot = foot.slice(0, -2).replace(/\s*\S*$/, '') + '…';
     x.fillText(foot, P, H - 116);
-    x.fillStyle = '#0D7680'; x.font = '600 27px ' + SANS; x.fillText('Lee más en AdmiBrief · ' + APP_URL().replace(/^https?:\/\//, '').replace(/\/$/, ''), P, H - 74);
+    x.fillStyle = '#0D7680'; x.font = '600 27px ' + SANS; x.fillText('Lee más en Pulso Empresarial · ' + APP_URL().replace(/^https?:\/\//, '').replace(/\/$/, ''), P, H - 74);
     return c;
   }
   async function openShare(kind) {
@@ -608,9 +608,9 @@
   async function shareImage(f) {
     const c = state.shareCanvas || await cardCanvas(f);
     const blob = await new Promise((r) => c.toBlob(r, 'image/png'));
-    const file = new File([blob], 'admibrief-' + f.kind.replace(/\W/g, '-') + '.png', { type: 'image/png' });
+    const file = new File([blob], 'pulso-empresarial-' + f.kind.replace(/\W/g, '-') + '.png', { type: 'image/png' });
     if (coarse.matches && navigator.canShare && navigator.canShare({ files: [file] })) {
-      try { await navigator.share({ files: [file], title: 'AdmiBrief', text: shareText(f, 'plain') }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
+      try { await navigator.share({ files: [file], title: 'Pulso Empresarial', text: shareText(f, 'plain') }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
     }
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name;
     document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
@@ -726,13 +726,13 @@
     let deferred;
     window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferred = e; $('#btnInstall').hidden = false; });
     $('#btnInstall').addEventListener('click', async () => { if (!deferred) return; deferred.prompt(); await deferred.userChoice; deferred = null; $('#btnInstall').hidden = true; });
-    window.addEventListener('appinstalled', () => { deferred = null; $('#btnInstall').hidden = true; renderInstall(); toast('AdmiBrief instalada'); });
+    window.addEventListener('appinstalled', () => { deferred = null; $('#btnInstall').hidden = true; renderInstall(); toast('Pulso Empresarial instalada'); });
     showOS(detectOS());
     $('#osTabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) showOS(b.dataset.os); });
-    function renderInstall() { $('#installNow').textContent = isStandalone() ? '✓ Ya estás usando AdmiBrief como app.' : 'Elige tu dispositivo y sigue los pasos (toma menos de un minuto).'; }
+    function renderInstall() { $('#installNow').textContent = isStandalone() ? '✓ Ya estás usando Pulso Empresarial como app.' : 'Elige tu dispositivo y sigue los pasos (toma menos de un minuto).'; }
     renderInstall();
     $('#btnNotif').addEventListener('click', toggleNotif);
-    $('#btnNotifTest').addEventListener('click', () => showNote('AdmiBrief', 'Así se verán tus avisos de noticias relevantes.', '', 'test'));
+    $('#btnNotifTest').addEventListener('click', () => showNote('Pulso Empresarial', 'Así se verán tus avisos de noticias relevantes.', '', 'test'));
     if (store.get(NOTIF_KEY, false)) { registerPeriodic(); syncSW(); }
     if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', (e) => { if (e.data && e.data.type === 'open') { location.hash = '#/n/' + e.data.id; } });
 
