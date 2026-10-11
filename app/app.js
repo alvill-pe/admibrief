@@ -296,7 +296,7 @@
     cobre: /\bcobre\b/i,
     oro: /\boro\b/i,
     wti: /petr[oó]leo|\bbrent\b|\bwti\b|precio de (la )?gasolina|combustibles?/i,
-    bvl: /bolsa de (valores de )?lima|\bbvl\b|bolsa limeña|burs[aá]til|\bacciones\b/i,
+    bvl: /bolsa de (valores de )?lima|\bbvl\b|bolsa limeña|burs[aá]til|\bIGBVL\b/i,
     tasa: /tasa de (inter[eé]s|referencia)|tasas de inter[eé]s|bcrp|banco central de reserva|reserva federal|\bfed\b/i,
     infl: /inflaci[oó]n|\bipc\b|canasta b[aá]sica|costo de vida/i
   };
