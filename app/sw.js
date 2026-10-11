@@ -1,6 +1,8 @@
 /* Pulso Empresarial service worker: siempre intenta la versión más reciente y, sin conexión,
    abre lo último guardado. */
-const CACHE = 'pulso-v13';
+const CACHE = 'pulso-v14';
+// ruta relativa a la carpeta de la app (funciona con cualquier nombre de repositorio)
+const rel = (p) => { const base = new URL(self.registration.scope).pathname; return p.startsWith(base) ? p.slice(base.length) : p; };
 const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'glossary.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 
@@ -20,11 +22,11 @@ self.addEventListener('fetch', (e) => {
   if (!same && !font) return; // imágenes de los medios: directo a la red
   // primero la red; si falla (sin conexión), lo guardado
   e.respondWith(fetch(e.request, same ? { cache: 'no-cache' } : undefined).then((res) => {
-    if (res.ok || res.type === 'opaque') { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(same ? url.pathname.replace(/^.*\/admibrief\//, '') || './' : e.request, copy)); }
+    if (res.ok || res.type === 'opaque') { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(same ? rel(url.pathname) || './' : e.request, copy)); }
     return res;
   }).catch(async () => {
     const c = await caches.open(CACHE);
-    const key = same ? (url.pathname.replace(/^.*\/admibrief\//, '') || './') : e.request;
+    const key = same ? (rel(url.pathname) || './') : e.request;
     return (await c.match(key)) || (await c.match(e.request, { ignoreSearch: true })) || (e.request.mode === 'navigate' ? c.match('index.html') : undefined);
   }));
 });
