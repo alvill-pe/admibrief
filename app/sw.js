@@ -1,7 +1,7 @@
 /* AdmiBrief service worker: siempre intenta la versión más reciente y, sin conexión,
    abre lo último guardado. */
-const CACHE = 'admibrief-v5';
-const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'manifest.webmanifest',
+const CACHE = 'admibrief-v6';
+const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'glossary.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
