@@ -27,8 +27,10 @@ export const FEEDS = [
   { sec: 'world', name: 'BBC Mundo',   url: 'https://feeds.bbci.co.uk/mundo/rss.xml', scrape: true },
 
   // ---------- Administración, empresas, marketing y tecnología ----------
-  { sec: 'adm',   name: 'Mercado Negro', url: 'https://www.mercadonegro.pe/feed/' },
-  { sec: 'adm',   name: 'El Comercio Tecnología', url: 'https://elcomercio.pe/arcio/rss/category/tecnologia/' }
+  // (además, la app clasifica en «Administración» las notas de empresas, gestión, marketing y MYPE de las otras secciones)
+  { sec: 'adm',   name: 'Gestión',       url: 'https://gestion.pe/arcio/rss/category/economia/empresas/' },
+  { sec: 'adm',   name: 'Gestión',       url: 'https://gestion.pe/arcio/rss/category/economia/management-empleo/' },
+  { sec: 'adm',   name: 'Mercado Negro', url: 'https://www.mercadonegro.pe/feed/' }
 ];
 
 // Secciones de las URL que no interesan (deporte, espectáculos, etc.)

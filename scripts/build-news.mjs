@@ -31,7 +31,7 @@ const NOW = Date.now();
 const HOUR = 3.6e6;
 const MAX_AGE_H = { peru: 36, pol: 36, eco: 48, world: 36, adm: 120 };
 const MAX_ITEMS = 220;
-const DATA_VERSION = 3; // si cambian las reglas, se descartan los datos anteriores
+const DATA_VERSION = 4; // si cambian las reglas, se descartan los datos anteriores
 
 // Motor de reglas compartido con la app
 vm.runInThisContext(fs.readFileSync(path.join(ROOT, 'scripts', 'insights.js'), 'utf8'));
@@ -116,6 +116,9 @@ function paragraphsFromHTML(html) {
     const t = cleanText($(el).text());
     if (!t || JUNK.test(t)) return;
     const tag = el.tagName.toLowerCase();
+    const linkText = cleanText($(el).find('a').text());
+    if (linkText.length > t.length * 0.7) return; // párrafo que solo enlaza a otra nota
+    if (/^(lee|lea|mira|ver|te puede|tambi[eé]n)\b.{0,40}:/i.test(t)) return;
     if (tag === 'p' && t.split(' ').length < 8) return;
     if (tag === 'li' && t.split(' ').length < 6) return;
     if ((tag === 'h2' || tag === 'h3')) { out.push({ h: true, t }); return; }
