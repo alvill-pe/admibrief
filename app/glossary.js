@@ -106,5 +106,36 @@ window.AB_GLOSSARY = [
   { t: 'Inteligencia artificial', k: 'inteligencia artificial', d: 'Sistemas que realizan tareas que requieren razonamiento humano, como analizar datos, redactar o reconocer imágenes.' },
   { t: 'Productividad', k: 'productividad', d: 'Cuánto se produce con los recursos disponibles. Es la base de la competitividad y de mejores sueldos.' },
   { t: 'Competitividad', k: 'competitividad', d: 'Capacidad de una empresa o país para vender más y mejor que sus competidores.' },
-  { t: 'Formalización', k: 'formalizaci[oó]n', d: 'Proceso por el que un negocio se registra ante el Estado (RUC, planilla, licencias) para operar legalmente.' }
+  { t: 'Formalización', k: 'formalizaci[oó]n', d: 'Proceso por el que un negocio se registra ante el Estado (RUC, planilla, licencias) para operar legalmente.' },
+  // ---------- Proyectos y estrategia
+  { t: 'Estudio de prefactibilidad', k: 'prefactibilidad', d: 'Análisis preliminar que estima si un proyecto es viable técnica y económicamente antes de invertir en estudios más detallados.' },
+  { t: 'Estudio de factibilidad', k: 'factibilidad', d: 'Evaluación detallada de costos, ingresos y riesgos que decide si un proyecto se ejecuta.' },
+  { t: 'Estudio de impacto ambiental', k: 'estudios? de impacto ambiental|EIA', d: 'Documento que identifica los efectos de un proyecto en el ambiente y las medidas para mitigarlos; se requiere para obtener permisos.' },
+  { t: 'Cartera de proyectos', k: 'cartera de proyectos', d: 'Conjunto de proyectos que una empresa o el Estado tiene en evaluación o ejecución.' },
+  { t: 'Capacidad instalada', k: 'capacidad instalada|capacidad de producci[oó]n', d: 'Máximo que una planta o empresa puede producir con sus recursos actuales.' },
+  { t: 'Participación de mercado', k: 'participaci[oó]n de mercado|cuota de mercado|market share', d: 'Porcentaje de las ventas totales de un sector que obtiene una empresa frente a sus competidores.' },
+  { t: 'CAPEX', k: 'CAPEX|capex', cs: 1, d: 'Gasto en bienes de capital: inversión en plantas, maquinaria o infraestructura que se usa por varios años.' },
+  { t: 'OPEX', k: 'OPEX|opex', cs: 1, d: 'Gastos operativos del día a día: sueldos, alquileres, servicios y mantenimiento.' },
+  { t: 'Franquicia', k: 'franquicias?', d: 'Modelo en el que una empresa cede el uso de su marca y su forma de operar a otro negocio a cambio de un pago.' },
+  { t: 'Canal de distribución', k: 'canal(es)? de (distribuci[oó]n|venta)', d: 'Vía por la que el producto llega al cliente: tiendas propias, mayoristas, bodegas, comercio electrónico.' },
+  { t: 'Cadena de valor', k: 'cadena de valor', d: 'Conjunto de actividades con las que una empresa crea valor para el cliente, desde el diseño hasta la posventa (modelo de Porter).' },
+  { t: 'Economías de escala', k: 'econom[ií]as? de escala', d: 'Ahorro en costo por unidad que se logra al producir en mayor volumen.' },
+  { t: 'Diversificación', k: 'diversificaci[oó]n|diversificar', d: 'Estrategia de entrar en nuevos productos, mercados o negocios para crecer y repartir el riesgo.' },
+  { t: 'Internacionalización', k: 'internacionalizaci[oó]n|nuevos mercados', d: 'Expansión de una empresa hacia otros países, mediante exportación, alianzas o filiales.' },
+  { t: 'Gremio empresarial', k: 'gremios?( empresariales?)?|Confiep|CONFIEP|Sociedad Nacional de Industrias|C[aá]mara de Comercio', d: 'Asociación que representa a las empresas de un sector ante el Estado y la sociedad.' },
+  { t: 'Electromovilidad', k: 'electromovilidad|veh[ií]culos? el[eé]ctricos?', d: 'Uso de vehículos eléctricos en el transporte; implica nuevas cadenas de suministro y de infraestructura de carga.' },
+  { t: 'Minería informal', k: 'miner[ií]a (informal|ilegal)|Reinfo|REINFO', d: 'Extracción de minerales sin cumplir requisitos legales y ambientales; el Reinfo es el registro para quienes buscan formalizarse.' },
+
+  // ---------- Política y Estado
+  { t: 'Prisión preventiva', k: 'prisi[oó]n preventiva', d: 'Medida por la que un juez ordena encarcelar a un investigado antes del juicio, si hay riesgo de fuga u obstrucción.' },
+  { t: 'Vacancia presidencial', k: 'vacancia( presidencial)?', d: 'Mecanismo por el que el Congreso puede destituir al presidente, por ejemplo, por «incapacidad moral permanente».' },
+  { t: 'Moción de censura', k: 'moci[oó]n(es)? de censura|censura(r)? (al|a la) ministr[oa]', d: 'Votación del Congreso para obligar a renunciar a un ministro o a todo el gabinete.' },
+  { t: 'Cuestión de confianza', k: 'cuesti[oó]n de confianza', d: 'Pedido del Ejecutivo al Congreso para que respalde una política; su rechazo puede provocar la caída del gabinete.' },
+  { t: 'Decreto de urgencia', k: 'decretos? de urgencia', d: 'Norma con rango de ley que el Ejecutivo dicta en materia económica y financiera cuando hay una necesidad urgente.' },
+  { t: 'Decreto legislativo', k: 'decretos? legislativos?|facultades legislativas', d: 'Ley que dicta el Ejecutivo cuando el Congreso le delega facultades para legislar sobre un tema y por un plazo.' },
+  { t: 'Contraloría', k: 'Contralor[ií]a', cs: 1, d: 'Contraloría General de la República: controla que los recursos públicos se usen correctamente.' },
+  { t: 'JNE', k: 'JNE|Jurado Nacional de Elecciones', cs: 1, d: 'Jurado Nacional de Elecciones: fiscaliza los procesos electorales y resuelve sus controversias.' },
+  { t: 'ONPE', k: 'ONPE', cs: 1, d: 'Oficina Nacional de Procesos Electorales: organiza las elecciones y el conteo de votos.' },
+  { t: 'Bicameralidad', k: 'bicameralidad|Senado|senadores', cs: 1, d: 'Sistema con dos cámaras legislativas (Senado y Cámara de Diputados), que el Perú retoma desde 2026.' },
+  { t: 'Gabinete', k: 'Consejo de Ministros|premier|presidente del Consejo de Ministros', d: 'Conjunto de ministros, liderado por el presidente del Consejo de Ministros (premier).' }
 ];
