@@ -354,3 +354,4 @@ body.sheet-open { overflow: hidden; }
 .toast { z-index: 80; }
 .kpi-c b { color: var(--ink); font-weight: 700; }
 .dato-card .spark.neutral { color: #9EC2FF; }
+.rd-section .rd-src { font-family: var(--sans); font-size: 12px; line-height: 1.4; color: var(--ink-3); margin: 8px 0 0; }

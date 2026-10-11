@@ -290,6 +290,27 @@
     return out;
   }
 
+  // indicadores macro que vienen al caso con la nota (no se muestran en todas)
+  const MACRO_KEYS = {
+    usd: /d[oó]lar|tipo de cambio|divisas?|devaluaci|import|export|aranc/i,
+    cobre: /cobre|miner|metal|canon|las bambas|antamina|cerro verde/i,
+    oro: /\boro\b|miner[ií]a|metales/i,
+    wti: /petr[oó]leo|combustible|gasolina|diesel|di[eé]sel|energ[ií]a|gas natural|transporte|flete|opep|opec/i,
+    bvl: /bolsa|acciones|\bbvl\b|burs[aá]til|inversionistas|cotiz|dividendo|ipo\b/i,
+    tasa: /\btasas?\b|cr[eé]ditos?|pr[eé]stamos?|financiamiento|\bbancos?\b|bcrp|banco central|reserva federal|\bfed\b|deuda|intereses?|morosidad/i,
+    infl: /inflaci|precios|canasta|costo de vida|ipc|alza de|encarec/i
+  };
+  function relevantMacro(i) {
+    const m = macro(); if (!m || !m.indicators) return [];
+    const sec = i.secs || [i.sec];
+    const text = i.title + ' ' + (i.summary || []).join(' ').slice(0, 1500);
+    let pick = m.indicators.filter((x) => !x.hidden && MACRO_KEYS[x.id] && MACRO_KEYS[x.id].test(text));
+    if (!pick.length && (sec.includes('eco') || (i.admin && /^Econ/.test(i.admin.pestel || '') && /Finanzas|Estrategia|Comercio/.test(i.admin.area || '')))) {
+      pick = m.indicators.filter((x) => ['usd', 'infl', 'tasa'].includes(x.id));
+    }
+    return pick.slice(0, 4);
+  }
+
   // ------------------------------------------------------------ glosario (modo Estudiante)
   const GLOSS = (window.AB_GLOSSARY || []).map((g, n) => {
     try { return { n, t: g.t, d: g.d, re: new RegExp('(?<![\\p{L}\\d])(?:' + g.k + ')(?![\\p{L}\\d])', 'gu' + (g.cs ? '' : 'i')) }; } catch (e) { return null; }
@@ -374,11 +395,11 @@
       h += '<section class="rd-admin exec"><div class="ins-top"><div class="ins-kicker">Implicancia estratégica</div>' + shareBtn('admin', 'Compartir la implicancia') + '</div>' +
         '<div class="rd-admin-head"><span class="chip">' + esc(a.area) + '</span>' + (a.pestel ? '<span class="chip ghost">PESTEL: ' + esc(a.pestel) + '</span>' : '') + '<span class="chip ghost">' + esc(a.concept) + '</span></div>' +
         '<p>' + esc(a.note) + '</p></section>';
-      const m = macro();
-      if (m && m.indicators && m.indicators.length) {
+      const mi = relevantMacro(i);
+      if (mi.length) {
         h += '<section class="rd-section"><h2 class="rd-h">Contexto macro</h2><div class="macro-grid">' +
-          m.indicators.filter((x) => !x.hidden).map((x) => '<div class="mtile"><div class="mt-l">' + esc(x.label) + (/^(S\/|%)$/.test(x.unit) ? '' : ' · ' + esc(x.unit)) + '</div><div class="mt-v">' + esc(shortVal(x)) + '</div><div class="mt-f">' + chgHTML(x) + sparkSVG(x.spark, 64, 22, chgInfo(x).cls) + '</div></div>').join('') +
-          '</div><p class="rd-src">Fuente: ' + esc(m.source) + '. Último dato disponible de cada indicador; la variación es frente al dato anterior.</p></section>';
+          mi.map((x) => '<div class="mtile"><div class="mt-l">' + esc(x.label) + (/^(S\/|%)$/.test(x.unit) ? '' : ' · ' + esc(x.unit)) + '</div><div class="mt-v">' + esc(shortVal(x)) + '</div><div class="mt-f">' + chgHTML(x) + sparkSVG(x.spark, 64, 22, chgInfo(x).cls) + '</div></div>').join('') +
+          '</div><p class="rd-src">Fuente: ' + esc(macro().source) + '. Último dato disponible; la variación es frente al dato anterior.</p></section>';
       }
       h += '<details class="rd-more"><summary>Leer el resumen completo</summary>' + (i.summary || []).map((p) => '<p>' + esc(p) + '</p>').join('') + '</details>';
     }
