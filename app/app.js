@@ -25,9 +25,9 @@
 
   const SECTIONS = [
     { id: 'top', label: 'Destacado' }, { id: 'peru', label: 'Perú' }, { id: 'pol', label: 'Política' },
-    { id: 'eco', label: 'Economía' }, { id: 'world', label: 'Mundo' }, { id: 'adm', label: 'Administración' }
+    { id: 'eco', label: 'Economía' }, { id: 'world', label: 'Mundo' }, { id: 'salud', label: 'Salud' }
   ];
-  const secLabel = (id) => (SECTIONS.find((s) => s.id === id) || {}).label || '';
+  const secLabel = (id) => (SECTIONS.find((s) => s.id === id) || {}).label || (id === 'adm' ? 'Economía' : 'Noticia');
   const DATA_KEY = 'ab2_data', SAVED_KEY = 'ab2_saved', FONT_KEY = 'ab2_font', SEC_KEY = 'ab2_sec';
   const REFRESH_MS = 5 * 60 * 1000;
   const SEEN_KEY = 'ab2_seen', NOTIF_KEY = 'ab2_notif', MODE_KEY = 'ab2_mode', DAYS_KEY = 'ab2_days', BEST_KEY = 'ab2_best';

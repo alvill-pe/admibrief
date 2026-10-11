@@ -94,9 +94,10 @@ body:not(.on-news) .tabs, body:not(.on-news) .searchbar { display: none; }
 .sec-eco { background: #E7F5EE; color: #1F7A50; }
 .sec-world { background: #EEEAFB; color: #5A45B0; }
 .sec-adm { background: #FBF4DF; color: #8A6A0B; }
+.sec-salud { background: #E3F5EC; color: #17794A; }
 @media (prefers-color-scheme: dark) {
   .sec-pol { background: #3A1E1A; color: #F0A596; } .sec-eco { background: #12301F; color: #7CD3A6; }
-  .sec-world { background: #251F44; color: #B6A7F2; } .sec-adm { background: #352B10; color: #E6C25C; }
+  .sec-world { background: #251F44; color: #B6A7F2; } .sec-adm { background: #352B10; color: #E6C25C; } .sec-salud { background: #0F3524; color: #6FD59A; }
 }
 .src { font-weight: 600; color: var(--ink-2); }
 .dot { opacity: .5; }
