@@ -127,7 +127,28 @@
     { k: ['educacion', 'universidad', 'sunedu', 'estudiantes', 'salud', 'essalud', 'minsa', 'pobreza', 'demograf', 'migracion'],
       area: 'Entorno social', pestel: 'Social', concept: 'Tendencias sociales', w: 1,
       note: 'Los cambios sociales definen el mercado de mañana: qué demandarán las personas y qué talento estará disponible.',
-      q: '¿Qué oportunidad de negocio abre esta tendencia?' }
+      q: '¿Qué oportunidad de negocio abre esta tendencia?' },
+    // ---- notas en inglés (prensa global)
+    { k: ['leadership', 'leaders', 'ceo$', 'ceos$', 'managers', 'management', 'workplace', 'employees', 'remote work', 'hybrid work', 'talent', 'hiring', 'layoffs', 'burnout', 'culture'],
+      area: 'Dirección', pestel: 'Social', concept: 'Liderazgo y gestión de equipos', w: 2,
+      note: 'Las grandes escuelas de negocios y los CEO globales coinciden: la ventaja competitiva depende cada vez más de cómo se dirige a las personas, se toman decisiones y se construye cultura.',
+      q: '¿Qué práctica de esta nota aplicarías mañana en un equipo pequeño?' },
+    { k: ['artificial intelligence', 'ai$', 'generative', 'openai', 'nvidia', 'chatgpt', 'software', 'cloud', 'cybersecurity', 'chips', 'semiconductor'],
+      area: 'Innovación y TI', pestel: 'Tecnológico', concept: 'Transformación digital e IA', w: 2,
+      note: 'La inteligencia artificial está cambiando costos, productividad y modelos de negocio en todos los sectores. El reto directivo es decidir dónde invertir y cómo gestionar sus riesgos.',
+      q: '¿Qué proceso de una empresa peruana podría automatizarse con esto y qué riesgo implicaría?' },
+    { k: ['merger', 'acquisition', 'takeover', 'deal$', 'ipo$', 'earnings', 'revenue', 'profit', 'shares', 'stocks', 'wall street', 'investors', 'valuation', 'private equity'],
+      area: 'Finanzas corporativas', pestel: 'Económico', concept: 'Valor de la empresa y mercado de capitales', w: 2,
+      note: 'Fusiones, resultados trimestrales y valorizaciones muestran cómo el mercado premia o castiga las decisiones estratégicas de las empresas.',
+      q: '¿Qué indicador financiero mirarías primero para juzgar si esta operación crea valor?' },
+    { k: ['inflation', 'interest rates', 'federal reserve', 'fed$', 'recession', 'gdp$', 'tariff', 'tariffs', 'trade war', 'treasury', 'debt', 'oil prices'],
+      area: 'Estrategia', pestel: 'Económico', concept: 'Entorno macroeconómico global', w: 2,
+      note: 'Las decisiones de EE. UU. y de las grandes economías se transmiten al Perú por el dólar, las tasas, los precios de los metales y la demanda externa.',
+      q: '¿Por qué canal (dólar, tasas, exportaciones) llegaría este efecto a una empresa peruana?' },
+    { k: ['strategy', 'competition', 'competitors', 'market share', 'customers', 'brand', 'pricing', 'supply chain', 'growth'],
+      area: 'Estrategia', pestel: 'Económico', concept: 'Estrategia competitiva', w: 1,
+      note: 'Los casos de la prensa global de negocios son lecciones de estrategia: cómo las empresas compiten, se diferencian y reaccionan ante cambios del mercado.',
+      q: '¿Qué ventaja competitiva busca la empresa de esta nota y es sostenible?' }
   ];
 
   const norm = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');

@@ -30,8 +30,8 @@ const AI_MAX = Number(process.env.AI_MAX || 8);
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 AdmiBrief/1.0';
 const NOW = Date.now();
 const HOUR = 3.6e6;
-const MAX_AGE_H = { peru: 36, pol: 36, eco: 48, world: 36, salud: 72 };
-const MAX_ITEMS = 220;
+const MAX_AGE_H = { peru: 36, pol: 36, eco: 48, world: 36, salud: 72, biz: 72 };
+const MAX_ITEMS = 280;
 const DATA_VERSION = 6; // si cambian las reglas, se descartan los datos anteriores
 
 // Motor de reglas compartido con la app
@@ -158,7 +158,7 @@ async function scrapeArticle(url) {
 }
 
 // ---------------------------------------------------------------- resumen extractivo
-const STOP = new Set(('a al algo algunas algunos ante antes como con contra cual cuales cuando de del desde donde dos el ella ellas ellos en entre era eran es esa esas ese eso esos esta estaba estado estan estas este esto estos fue fueron ha habia han hasta hay la las le les lo los mas me mi muy no nos o otra otras otro otros para pero poco por porque que quien se ser si sido sin sobre son su sus tambien tiene tienen todo todos tras un una unas uno unos y ya segun asi solo cada dijo dice senalo indico afirmo explico agrego precisO durante luego mientras ademas tanto parte ano anos hoy ayer esto ser sera seran puede pueden podria hacer hace'.toLowerCase()).split(' '));
+const STOP = new Set(('a al algo algunas algunos ante antes como con contra cual cuales cuando de del desde donde dos el ella ellas ellos en entre era eran es esa esas ese eso esos esta estaba estado estan estas este esto estos fue fueron ha habia han hasta hay la las le les lo los mas me mi muy no nos o otra otras otro otros para pero poco por porque que quien se ser si sido sin sobre son su sus tambien tiene tienen todo todos tras un una unas uno unos y ya segun asi solo cada dijo dice senalo indico afirmo explico agrego precisO durante luego mientras ademas tanto parte ano anos hoy ayer esto ser sera seran puede pueden podria hacer hace the and for that with this from are was were has have had its not but they their them you your our will would can could also more than into about after over said says just been being which what when who how than then there these those other some such only most many much very new one two'.toLowerCase()).split(' '));
 const words = (s) => normText(s).split(/[^a-z0-9ñ%]+/).filter((w) => w.length > 2 && !STOP.has(w));
 
 function splitSentences(p) {
@@ -312,7 +312,7 @@ async function main() {
   for (const r of raw) {
     if (EXCLUDE_URL.test(r.link) || EXCLUDE_TITLE.test(r.title)) continue;
     const date = r.date ? Math.min(r.date, NOW) : NOW;
-    if (NOW - date > MAX_AGE_H[r.feed.sec] * HOUR) continue;
+    if (NOW - date > (r.feed.maxAge || MAX_AGE_H[r.feed.sec]) * HOUR) continue;
     const id = idOf(r.link);
     if (byId.has(id)) { const e = byId.get(id); if (!e.secs.includes(r.feed.sec)) e.secs.push(r.feed.sec); continue; }
     byId.set(id, { id, r, date, secs: [r.feed.sec] });
@@ -330,7 +330,7 @@ async function main() {
     }
     let paras = r.html ? paragraphsFromHTML(r.html) : [];
     let img = r.img, desc = r.desc;
-    if ((!paras.length || paras.reduce((n, p) => n + p.t.split(' ').length, 0) < 90) && !FIXTURES) {
+    if (!r.feed.brief && (!paras.length || paras.reduce((n, p) => n + p.t.split(' ').length, 0) < 90) && !FIXTURES) {
       try { const s = await scrapeArticle(r.link); if (s.paras.length) paras = s.paras; img = img || s.img; desc = desc || s.desc; } catch (e) {}
     } else if (FIXTURES && r.feed.scrape) {
       try { const s = await scrapeArticleFixture(r.link); if (s && s.paras.length) paras = s.paras; } catch (e) {}
@@ -339,7 +339,7 @@ async function main() {
     const ex = extractiveSummary(r.title, paras);
     if (!ex.paragraphs.length) return;
     const full = paras.filter((p) => !p.h).map((p) => p.t).join('\n');
-    if (ex.paragraphs.join(' ').split(' ').length < 60) return; // demasiado corto para entenderse sin abrir la nota
+    if (ex.paragraphs.join(' ').split(' ').length < (r.feed.brief ? 8 : 60)) return; // demasiado corto para entenderse sin abrir la nota
     const ins = analyzeNews(r.title, full.slice(0, 700));
     const tIns = analyzeNews(r.title, full.slice(0, 300));
     let s2 = secs.slice();
@@ -349,6 +349,7 @@ async function main() {
       id, title: r.title, link: r.link, source: r.feed.name.replace(/ Tecnología$/, ''), secs: s2, sec: s2[0], date,
       img: /^https:\/\//.test(img || '') ? img : '',
       summary: ex.paragraphs, points: ex.points, words: ex.words, ai: false,
+      lang: r.feed.lang || 'es', brief: !!r.feed.brief || ex.words < 70,
       admin: { area: ins.area, pestel: ins.pestel, concept: ins.concept, note: ins.note, q: ins.q }, iscore: ins.score,
       _full: full
     });
@@ -404,7 +405,8 @@ async function main() {
   const top = []; const perSec = {};
   for (const it of fresh) {
     if (top.length >= 25) break;
-    const s = it.secs[0]; if ((perSec[s] = (perSec[s] || 0) + 1) > (s === 'world' ? 4 : s === 'salud' ? 3 : 6)) continue;
+    const s = it.secs[0]; if ((perSec[s] = (perSec[s] || 0) + 1) > (s === 'world' ? 4 : s === 'salud' ? 3 : s === 'biz' ? 5 : 6)) continue;
+    if (it.lang === 'en' && (perSec.en = (perSec.en || 0) + 1) > 3) continue;
     if (top.some((id) => { const o = fresh.find((x) => x.id === id); return o && o.group === it.group; })) continue;
     top.push(it.id);
   }

@@ -30,10 +30,18 @@ export const FEEDS = [
   // (además, la app pasa a «Salud» las notas de salud de las otras fuentes: Minsa, EsSalud, hospitales, dengue, etc.)
   { sec: 'salud', name: 'Infobae Salud', url: 'https://www.infobae.com/arc/outboundfeeds/rss/category/salud/' },
 
+  // ---------- Negocios y prensa global ----------
+  // brief: el medio solo publica un adelanto en su RSS (no se lee la página: puede tener muro de pago)
+  { sec: 'biz', name: 'Bloomberg Línea', url: 'https://www.bloomberglinea.com/arc/outboundfeeds/rss/?outputType=xml' },
+  { sec: 'biz', name: 'Expansión',       url: 'https://e00-expansion.uecdn.es/rss/portada.xml', brief: true },
+  { sec: 'biz', name: 'Fortune',         url: 'https://fortune.com/feed/', lang: 'en' },
+  { sec: 'biz', name: 'Harvard Business Review', url: 'http://feeds.hbr.org/harvardbusiness', lang: 'en', brief: true, maxAge: 168 },
+  { sec: 'biz', name: 'Forbes',          url: 'https://www.forbes.com/business/feed/', lang: 'en', brief: true },
+
   // ---------- Economía (general) ----------
   { sec: 'eco',   name: 'Gestión',       url: 'https://gestion.pe/arcio/rss/' }
 ];
 
 // Secciones de las URL que no interesan (deporte, espectáculos, etc.)
 export const EXCLUDE_URL = /\/(deportes?|futbol|deporte-total|espectaculos|entretenimiento|tvmas|luces|horoscopo|signos|somos|viu|provecho|respuestas|celebridades|farandula|cine|musica|videojuegos|loterias?|virales|gastronomia|estilos?|cultura|vamos|mag|wuf|ocio|trome|mujer|familia|elecciones-resultados)\//i;
-export const EXCLUDE_TITLE = /(EN VIVO|minuto a minuto|hor[oó]scopo|loter[ií]a|la tinka|k[aá]bala|d[oó]nde ver|a qu[eé] hora juega|qu[eé] canal|crucigrama|sudoku|resultados onpe al|conteo oficial|ver aqu[ií] el|link para ver)/i;
+export const EXCLUDE_TITLE = /(EN VIVO|minuto a minuto|hor[oó]scopo|loter[ií]a|la tinka|k[aá]bala|d[oó]nde ver|a qu[eé] hora juega|qu[eé] canal|crucigrama|sudoku|resultados onpe al|conteo oficial|ver aqu[ií] el|link para ver|\\bWWE\\b|\\bNFL\\b|\\bNBA\\b|\\bMLB\\b|\\bNHL\\b|Premier League|Super Bowl|predictions|box office|wordle|crossword|quordle|horoscope)/i;
