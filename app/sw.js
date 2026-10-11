@@ -1,5 +1,5 @@
 /* AdmiBrief service worker: abre al instante y permite leer sin conexión. */
-const CACHE = 'admibrief-v2';
+const CACHE = 'admibrief-v3';
 const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 
