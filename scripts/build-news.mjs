@@ -1,6 +1,6 @@
-// AdmiBrief — generador de noticias.
+// Pulso Empresarial — generador de noticias.
 // Corre cada hora en GitHub Actions (gratis): lee los RSS, obtiene el texto de cada nota,
-// arma un resumen amplio + datos clave + «Clave para el administrador» y escribe news.json.
+// arma un resumen amplio + datos clave + «Clave de negocio» y escribe news.json.
 //
 // Uso local:  node scripts/build-news.mjs [carpeta_salida]
 // Variables opcionales:
@@ -27,7 +27,7 @@ const FIXTURES = process.env.FIXTURES || '';
 const AI_TOKEN = process.env.GITHUB_TOKEN || '';
 const AI_MODEL = process.env.AI_MODEL || 'openai/gpt-4o-mini';
 const AI_MAX = Number(process.env.AI_MAX || 8);
-const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 AdmiBrief/1.0';
+const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 PulsoEmpresarial/1.0';
 const NOW = Date.now();
 const HOUR = 3.6e6;
 const MAX_AGE_H = { peru: 36, pol: 36, eco: 48, world: 36, salud: 72, biz: 72 };
@@ -234,7 +234,7 @@ Lee la noticia y responde SOLO con JSON válido con esta forma:
 Reglas:
 - "resumen": 3 a 5 párrafos en español, con tus propias palabras (no copies frases textuales), 250 a 380 palabras en total. Explica qué pasó, quiénes participan, cifras importantes, contexto y qué podría pasar después. Debe entenderse sin leer la nota original.
 - "puntos": 3 a 5 datos concretos (cifras, fechas, decisiones), cada uno de una línea.
-- "admin": área de la empresa más afectada (Finanzas, Marketing, Recursos Humanos, Operaciones y logística, Estrategia, Legal y cumplimiento, Emprendimiento, Innovación y TI, etc.), el concepto de Administración que ilustra, una explicación de 2-3 oraciones de por qué importa a un administrador y una pregunta de reflexión.
+- "admin": área de la empresa más afectada (Finanzas, Marketing, Recursos Humanos, Operaciones y logística, Estrategia, Legal y cumplimiento, Emprendimiento, Innovación y TI, etc.), el concepto de Administración que ilustra, una explicación de 2-3 oraciones de por qué importa a un gerente o empresario y una pregunta de reflexión.
 - No inventes datos que no estén en la nota.
 
 TITULAR: ${item.title}

@@ -1,4 +1,4 @@
-/* «Clave para el administrador»: motor de reglas local y gratuito.
+/* «Clave de negocio»: motor de reglas local y gratuito.
    Lee el titular y el resumen, detecta el tema y devuelve:
    - área de la empresa afectada, factor PESTEL, concepto a aprender y una pregunta de reflexión.
    Las palabras clave van sin tildes y en minúsculas. Un "$" al final exige palabra completa. */
@@ -22,7 +22,7 @@
       q: '¿Qué oportunidad de negocio nace de esta tendencia de salud y a qué segmento de clientes apuntarías?' },
     { k: ['inflacion', 'ipc', 'alza de precios', 'precios al consumidor', 'canasta basica', 'costo de vida'],
       area: 'Finanzas', pestel: 'Económico', concept: 'Inflación y poder adquisitivo', w: 3,
-      note: 'Cuando suben los precios, los costos de la empresa y el poder de compra del cliente cambian. Un administrador revisa precios de venta, contratos con proveedores y márgenes.',
+      note: 'Cuando suben los precios, los costos de la empresa y el poder de compra del cliente cambian. Un gerente revisa precios de venta, contratos con proveedores y márgenes.',
       q: '¿Qué costos de una empresa que conoces subirían primero y cómo protegerías su margen?' },
     { k: ['tasa de referencia', 'tasa de interes', 'bcrp', 'banco central', 'reserva federal', 'la fed', 'fed$', 'politica monetaria'],
       area: 'Finanzas', pestel: 'Económico', concept: 'Costo del dinero y financiamiento', w: 3,
@@ -42,7 +42,7 @@
       q: '¿Qué producto peruano se vería más afectado por esta medida y por qué?' },
     { k: ['sunat', 'impuesto', 'igv', 'tributari', 'renta de tercera', 'evasion', 'recaudacion', 'detracciones'],
       area: 'Contabilidad y tributación', pestel: 'Legal', concept: 'Carga tributaria y cumplimiento', w: 3,
-      note: 'Los cambios tributarios alteran el flujo de caja y la formalización. Un administrador planifica el pago de impuestos y evalúa regímenes (RUS, RER, MYPE Tributario).',
+      note: 'Los cambios tributarios alteran el flujo de caja y la formalización. Un gerente planifica el pago de impuestos y evalúa regímenes (RUS, RER, MYPE Tributario).',
       q: '¿Qué régimen tributario le convendría a una microempresa con este cambio?' },
     { k: ['empleo', 'desempleo', 'remuneracion minima', 'sueldo minimo', 'salario', 'cts$', 'gratificacion', 'laboral', 'trabajadores', 'sindicato', 'huelga', 'informalidad'],
       area: 'Recursos Humanos', pestel: 'Social / Legal', concept: 'Gestión del talento y costos laborales', w: 3,
@@ -54,7 +54,7 @@
       q: '¿Esta noticia aumenta o reduce la confianza de un inversionista? ¿Por qué?' },
     { k: ['ley$', 'decreto', 'reglamento', 'regulacion', 'norma$', 'normas$','indecopi', 'sunafil', 'osinergmin', 'sbs$', 'osiptel'],
       area: 'Legal y cumplimiento', pestel: 'Legal', concept: 'Marco regulatorio', w: 2,
-      note: 'Las nuevas normas crean obligaciones y oportunidades. El administrador evalúa el costo de cumplir y los riesgos de no hacerlo (multas, reputación).',
+      note: 'Las nuevas normas crean obligaciones y oportunidades. El gerente evalúa el costo de cumplir y los riesgos de no hacerlo (multas, reputación).',
       q: '¿Qué tendría que cambiar una empresa para cumplir esta norma?' },
     { k: ['mineria', 'minera', 'cobre', 'oro$', 'zinc', 'conflicto social', 'canon'],
       area: 'Estrategia sectorial', pestel: 'Económico / Social', concept: 'Sectores clave del Perú', w: 2,
@@ -62,7 +62,7 @@
       q: '¿Qué otras empresas (proveedores, servicios, comercio local) dependen de esta actividad?' },
     { k: ['inteligencia artificial', 'ia$', 'chatgpt', 'automatizacion', 'transformacion digital', 'tecnologia', 'ciberseguridad', 'fintech', 'comercio electronico', 'e-commerce', 'startup'],
       area: 'Innovación y TI', pestel: 'Tecnológico', concept: 'Transformación digital', w: 3,
-      note: 'La tecnología cambia cómo se produce, vende y compite. Un administrador identifica qué procesos automatizar y qué habilidades necesitará su equipo.',
+      note: 'La tecnología cambia cómo se produce, vende y compite. Un gerente identifica qué procesos automatizar y qué habilidades necesitará su equipo.',
       q: '¿Qué proceso de una empresa que conoces podría mejorar con esta tecnología?' },
     { k: ['mype', 'mypes', 'pyme', 'pymes', 'emprend', 'microempresa', 'pequena empresa', 'reactiva', 'impulso myperu', 'cofide'],
       area: 'Emprendimiento', pestel: 'Económico', concept: 'Gestión de MYPE', w: 3,

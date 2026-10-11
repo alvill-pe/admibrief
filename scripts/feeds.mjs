@@ -1,4 +1,4 @@
-// Fuentes de AdmiBrief. Todas son RSS públicos de los medios.
+// Fuentes de Pulso Empresarial. Todas son RSS públicos de los medios.
 // full: el feed trae el texto completo de la nota (content:encoded).
 // scrape: hay que leer la página de la nota para obtener el texto.
 export const FEEDS = [
