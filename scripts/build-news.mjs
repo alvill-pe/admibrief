@@ -30,9 +30,9 @@ const AI_MAX = Number(process.env.AI_MAX || 8);
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 AdmiBrief/1.0';
 const NOW = Date.now();
 const HOUR = 3.6e6;
-const MAX_AGE_H = { peru: 36, pol: 36, eco: 48, world: 36, adm: 120 };
+const MAX_AGE_H = { peru: 36, pol: 36, eco: 48, world: 36, salud: 72 };
 const MAX_ITEMS = 220;
-const DATA_VERSION = 5; // si cambian las reglas, se descartan los datos anteriores
+const DATA_VERSION = 6; // si cambian las reglas, se descartan los datos anteriores
 
 // Motor de reglas compartido con la app
 vm.runInThisContext(fs.readFileSync(path.join(ROOT, 'scripts', 'insights.js'), 'utf8'));
@@ -267,9 +267,10 @@ ${fullText.slice(0, 7000)}`;
 }
 
 // ---------------------------------------------------------------- agrupación y relevancia
-const ADM_AREAS = new Set(['Dirección', 'Emprendimiento', 'Marketing', 'Innovación y TI', 'Operaciones y logística', 'Gobierno corporativo', 'Responsabilidad social', 'Recursos Humanos', 'Finanzas corporativas', 'Evaluación de proyectos']);
-const ADM_URL = /\/(empresas|management|emprendimiento|negocios|marketing|tecnologia|innovacion|publicidad|branding|retail|startups?|mypes?)\//i;
-const ADM_TITLE = /(\bCEO\b|gerente|empresa|compañía|\bmarcas?\b|emprend|\bmypes?\b|\bpymes?\b|startup|invierte|inversión de|negocio|liderazgo|ventas|retail|consumidor|exportador|mercado laboral|empleo|trabajadores|restaurantes|tiendas|banco|financier)/i;
+// Salud: notas de la sección de salud de los medios y notas de otras secciones que tratan de salud
+const HEALTH_URL = /\/(salud|sanidad)(\/|-)/i;
+const HEALTH_TITLE = /(\bminsa\b|essalud|ministerio de salud|ministra de salud|ministro de salud|hospital|\bsalud\b|dengue|vacun|epidemia|brote|medicament|cl[ií]nica|enfermedad|c[aá]ncer|diabetes|pacientes?|\bm[eé]dic[oa]s?\b|covid|gripe|\boms\b|sanitari|desnutrici[oó]n|anemia|farmacia|botica|digemid|hipertensi[oó]n|obesidad)/i;
+const HEALTH_NOT = /(salud (financiera|del mercado|de la econom)|crisis de salud (pol[ií]tica)|salud fiscal)/i;
 
 const tokSet = (t) => new Set(words(t).filter((w) => w.length > 3));
 const storyToks = (i) => new Set([...words(i.title), ...words(((i.summary && i.summary[0]) || '').split(' ').slice(0, 35).join(' '))].filter((w) => w.length > 3));
@@ -342,10 +343,10 @@ async function main() {
     const ins = analyzeNews(r.title, full.slice(0, 700));
     const tIns = analyzeNews(r.title, full.slice(0, 300));
     let s2 = secs.slice();
-    const noAdm = /(asesin|homicid|criminal|sicari|muert|fallec|terremoto|sismo|tembl|incendio|huracán|accidente|elecciones|ONPE|JNE)/i.test(r.title);
-    if (!s2.includes('adm') && !noAdm && (ADM_URL.test(r.link) || ((secs.includes('eco') || secs.includes('peru')) && ((ADM_AREAS.has(tIns.area) && tIns.score >= 3) || ADM_TITLE.test(r.title))))) s2.push('adm');
+    const isHealth = !s2.includes('salud') && !HEALTH_NOT.test(r.title) && (HEALTH_URL.test(r.link) || HEALTH_TITLE.test(r.title));
+    if (isHealth) s2.unshift('salud'); // la salud pasa a ser la sección principal de la nota
     fresh.push({
-      id, title: r.title, link: r.link, source: r.feed.name.replace(/ Tecnología$/, ''), secs: s2, sec: secs[0], date,
+      id, title: r.title, link: r.link, source: r.feed.name.replace(/ Tecnología$/, ''), secs: s2, sec: s2[0], date,
       img: /^https:\/\//.test(img || '') ? img : '',
       summary: ex.paragraphs, points: ex.points, words: ex.words, ai: false,
       admin: { area: ins.area, pestel: ins.pestel, concept: ins.concept, note: ins.note, q: ins.q }, iscore: ins.score,
@@ -403,7 +404,7 @@ async function main() {
   const top = []; const perSec = {};
   for (const it of fresh) {
     if (top.length >= 25) break;
-    const s = it.secs[0]; if ((perSec[s] = (perSec[s] || 0) + 1) > (s === 'world' ? 4 : 6)) continue;
+    const s = it.secs[0]; if ((perSec[s] = (perSec[s] || 0) + 1) > (s === 'world' ? 4 : s === 'salud' ? 3 : 6)) continue;
     if (top.some((id) => { const o = fresh.find((x) => x.id === id); return o && o.group === it.group; })) continue;
     top.push(it.id);
   }

@@ -4,6 +4,22 @@
    Las palabras clave van sin tildes y en minúsculas. Un "$" al final exige palabra completa. */
 (function (G) {
   const R = [
+    { k: ['minsa', 'essalud', 'sistema de salud', 'hospital', 'hospitales', 'postas medicas', 'establecimientos de salud', 'ministerio de salud', 'sis$', 'atencion medica', 'pacientes', 'desabastecimiento de medicamentos'],
+      area: 'Gestión sanitaria', pestel: 'Social / Político', concept: 'Gestión de servicios de salud', w: 3,
+      note: 'Los hospitales y redes de salud son organizaciones que gestionan presupuesto, personal, logística y calidad de atención. Sus problemas (listas de espera, desabastecimiento, deuda) son casos reales de administración pública.',
+      q: '¿Qué indicador usarías para medir si un hospital está bien administrado: tiempo de espera, costo por paciente o satisfacción?' },
+    { k: ['dengue', 'vacuna', 'vacunacion', 'brote', 'epidemia', 'pandemia', 'covid', 'gripe', 'influenza', 'virus', 'oms$', 'ops$', 'contagio', 'enfermedad'],
+      area: 'Gestión de riesgos', pestel: 'Social / Ecológico', concept: 'Gestión de riesgos y continuidad del negocio', w: 3,
+      note: 'Los brotes y emergencias sanitarias interrumpen la cadena de suministro, el ausentismo y la demanda. Las empresas preparadas tienen planes de contingencia y continuidad operativa.',
+      q: '¿Qué plan de contingencia necesitaría una empresa si el 20% de su personal se enferma a la vez?' },
+    { k: ['salud mental', 'estres', 'burnout', 'ansiedad', 'depresion', 'bienestar', 'sueno', 'sedentarismo'],
+      area: 'Recursos Humanos', pestel: 'Social', concept: 'Bienestar laboral y productividad', w: 3,
+      note: 'El estrés, el agotamiento y la mala salud elevan el ausentismo y bajan la productividad. Cuidar el bienestar del equipo es una inversión con retorno medible.',
+      q: '¿Qué programa de bienestar propondrías en una pyme con poco presupuesto y cómo medirías su impacto?' },
+    { k: ['medicamento', 'medicamentos', 'farmacia', 'farmacias', 'botica', 'clinica', 'clinicas', 'seguro de salud', 'eps$', 'digemid', 'laboratorio', 'cancer', 'diabetes', 'obesidad', 'hipertension', 'dieta', 'nutricion'],
+      area: 'Mercado y estrategia', pestel: 'Social / Económico', concept: 'Mercado de salud y hábitos del consumidor', w: 2,
+      note: 'La salud es un mercado grande y en crecimiento: seguros, clínicas, farmacias, alimentos saludables y servicios digitales. Los cambios de hábitos de las personas crean oportunidades de negocio.',
+      q: '¿Qué oportunidad de negocio nace de esta tendencia de salud y a qué segmento de clientes apuntarías?' },
     { k: ['inflacion', 'ipc', 'alza de precios', 'precios al consumidor', 'canasta basica', 'costo de vida'],
       area: 'Finanzas', pestel: 'Económico', concept: 'Inflación y poder adquisitivo', w: 3,
       note: 'Cuando suben los precios, los costos de la empresa y el poder de compra del cliente cambian. Un administrador revisa precios de venta, contratos con proveedores y márgenes.',

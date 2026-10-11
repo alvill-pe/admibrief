@@ -26,11 +26,14 @@ export const FEEDS = [
   { sec: 'world', name: 'Infobae',     url: 'https://www.infobae.com/arc/outboundfeeds/rss/category/america/' },
   { sec: 'world', name: 'BBC Mundo',   url: 'https://feeds.bbci.co.uk/mundo/rss.xml', scrape: true },
 
-  // ---------- Administración, empresas, marketing y tecnología ----------
-  // (además, la app clasifica en «Administración» las notas de empresas, gestión, marketing y MYPE de las otras secciones)
+  // ---------- Salud ----------
+  // (además, la app pasa a «Salud» las notas de salud de las otras fuentes: Minsa, EsSalud, hospitales, dengue, etc.)
+  { sec: 'salud', name: 'Infobae Salud', url: 'https://www.infobae.com/arc/outboundfeeds/rss/category/salud/' },
+
+  // ---------- Economía (general) ----------
   { sec: 'eco',   name: 'Gestión',       url: 'https://gestion.pe/arcio/rss/' }
 ];
 
 // Secciones de las URL que no interesan (deporte, espectáculos, etc.)
-export const EXCLUDE_URL = /\/(deportes?|futbol|deporte-total|espectaculos|entretenimiento|tvmas|luces|horoscopo|signos|somos|viu|provecho|respuestas|celebridades|farandula|cine|musica|videojuegos|loterias?|virales|gastronomia|estilos?|cultura|vamos|mag|wuf|ocio|trome|mujer|familia|salud\/bienestar|elecciones-resultados)\//i;
+export const EXCLUDE_URL = /\/(deportes?|futbol|deporte-total|espectaculos|entretenimiento|tvmas|luces|horoscopo|signos|somos|viu|provecho|respuestas|celebridades|farandula|cine|musica|videojuegos|loterias?|virales|gastronomia|estilos?|cultura|vamos|mag|wuf|ocio|trome|mujer|familia|elecciones-resultados)\//i;
 export const EXCLUDE_TITLE = /(EN VIVO|minuto a minuto|hor[oó]scopo|loter[ií]a|la tinka|k[aá]bala|d[oó]nde ver|a qu[eé] hora juega|qu[eé] canal|crucigrama|sudoku|resultados onpe al|conteo oficial|ver aqu[ií] el|link para ver)/i;
