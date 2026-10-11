@@ -292,23 +292,19 @@
 
   // indicadores macro que vienen al caso con la nota (no se muestran en todas)
   const MACRO_KEYS = {
-    usd: /d[oó]lar|tipo de cambio|divisas?|devaluaci|import|export|aranc/i,
-    cobre: /cobre|miner|metal|canon|las bambas|antamina|cerro verde/i,
-    oro: /\boro\b|miner[ií]a|metales/i,
-    wti: /petr[oó]leo|combustible|gasolina|diesel|di[eé]sel|energ[ií]a|gas natural|transporte|flete|opep|opec/i,
-    bvl: /bolsa|acciones|\bbvl\b|burs[aá]til|inversionistas|cotiz|dividendo|ipo\b/i,
-    tasa: /\btasas?\b|cr[eé]ditos?|pr[eé]stamos?|financiamiento|\bbancos?\b|bcrp|banco central|reserva federal|\bfed\b|deuda|intereses?|morosidad/i,
-    infl: /inflaci|precios|canasta|costo de vida|ipc|alza de|encarec/i
+    usd: /d[oó]lar|tipo de cambio|devaluaci|apreciaci[oó]n del sol|divisas/i,
+    cobre: /\bcobre\b/i,
+    oro: /\boro\b/i,
+    wti: /petr[oó]leo|\bbrent\b|\bwti\b|precio de (la )?gasolina|combustibles?/i,
+    bvl: /bolsa de (valores de )?lima|\bbvl\b|bolsa limeña|burs[aá]til|\bacciones\b/i,
+    tasa: /tasa de (inter[eé]s|referencia)|tasas de inter[eé]s|bcrp|banco central de reserva|reserva federal|\bfed\b/i,
+    infl: /inflaci[oó]n|\bipc\b|canasta b[aá]sica|costo de vida/i
   };
+  // solo cuando la noticia trata de ese tema (en el titular o en el primer párrafo)
   function relevantMacro(i) {
     const m = macro(); if (!m || !m.indicators) return [];
-    const sec = i.secs || [i.sec];
-    const text = i.title + ' ' + (i.summary || []).join(' ').slice(0, 1500);
-    let pick = m.indicators.filter((x) => !x.hidden && MACRO_KEYS[x.id] && MACRO_KEYS[x.id].test(text));
-    if (!pick.length && (sec.includes('eco') || (i.admin && /^Econ/.test(i.admin.pestel || '') && /Finanzas|Estrategia|Comercio/.test(i.admin.area || '')))) {
-      pick = m.indicators.filter((x) => ['usd', 'infl', 'tasa'].includes(x.id));
-    }
-    return pick.slice(0, 4);
+    const text = i.title + ' ' + ((i.summary || [])[0] || '');
+    return m.indicators.filter((x) => !x.hidden && MACRO_KEYS[x.id] && MACRO_KEYS[x.id].test(text)).slice(0, 3);
   }
 
   // ------------------------------------------------------------ glosario (modo Estudiante)

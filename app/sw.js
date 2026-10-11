@@ -1,6 +1,6 @@
 /* AdmiBrief service worker: siempre intenta la versión más reciente y, sin conexión,
    abre lo último guardado. */
-const CACHE = 'admibrief-v8';
+const CACHE = 'admibrief-v9';
 const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'glossary.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 
