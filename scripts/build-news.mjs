@@ -17,7 +17,7 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { XMLParser } from 'fast-xml-parser';
 import * as cheerio from 'cheerio';
-import { FEEDS, EXCLUDE_URL, EXCLUDE_TITLE } from './feeds.mjs';
+import { FEEDS, EXCLUDE_URL, EXCLUDE_TITLE, offTopic } from './feeds.mjs';
 import { buildMacro } from './macro.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -32,7 +32,7 @@ const NOW = Date.now();
 const HOUR = 3.6e6;
 const MAX_AGE_H = { peru: 36, pol: 36, eco: 48, world: 36, salud: 72, biz: 72 };
 const MAX_ITEMS = 280;
-const DATA_VERSION = 7; // si cambian las reglas, se descartan los datos anteriores
+const DATA_VERSION = 8; // si cambian las reglas, se descartan los datos anteriores
 
 // Motor de reglas compartido con la app
 vm.runInThisContext(fs.readFileSync(path.join(ROOT, 'scripts', 'insights.js'), 'utf8'));
@@ -310,7 +310,7 @@ async function main() {
   // 3) filtrar y deduplicar por URL
   const byId = new Map();
   for (const r of raw) {
-    if (EXCLUDE_URL.test(r.link) || EXCLUDE_TITLE.test(r.title)) continue;
+    if (EXCLUDE_URL.test(r.link) || EXCLUDE_TITLE.test(r.title) || offTopic(r.feed, r.title, r.desc)) continue;
     const date = r.date ? Math.min(r.date, NOW) : NOW;
     if (NOW - date > (r.feed.maxAge || MAX_AGE_H[r.feed.sec]) * HOUR) continue;
     const id = idOf(r.link);
