@@ -60,17 +60,63 @@
       <div id="savedList" class="feed"></div>
     </section>
 
+    <section id="viewApp" class="view" hidden>
+      <div class="view-head">
+        <h2>Tu app y avisos</h2>
+        <p>Instala AdmiBrief como una app y activa las alertas de las noticias más importantes.</p>
+      </div>
+
+      <div class="info-card" id="installCard">
+        <h3>Instalar como app</h3>
+        <p class="muted" id="installNow"></p>
+        <button class="btn-primary" id="btnInstall" hidden>Instalar AdmiBrief ahora</button>
+        <div class="seg" id="osTabs" role="tablist">
+          <button role="tab" data-os="ios">iPhone</button>
+          <button role="tab" data-os="android">Android</button>
+          <button role="tab" data-os="pc">PC</button>
+        </div>
+        <ol class="steps" data-os="ios">
+          <li>Abre esta página en <b>Safari</b> (no dentro de otra app como Instagram o WhatsApp).</li>
+          <li>Toca el botón <b>Compartir</b> <span class="kbd">⬆︎</span> (cuadrado con una flecha, abajo en el centro).</li>
+          <li>Desliza y elige <b>Agregar a inicio</b>.</li>
+          <li>Toca <b>Agregar</b>. Aparecerá el ícono de AdmiBrief en tu pantalla de inicio.</li>
+        </ol>
+        <ol class="steps" data-os="android" hidden>
+          <li>Abre esta página en <b>Chrome</b>.</li>
+          <li>Toca el menú <span class="kbd">⋮</span> (arriba a la derecha).</li>
+          <li>Elige <b>Instalar app</b> o <b>Agregar a la pantalla principal</b>.</li>
+          <li>Confirma con <b>Instalar</b>. AdmiBrief se abrirá como una app, sin barra del navegador.</li>
+        </ol>
+        <ol class="steps" data-os="pc" hidden>
+          <li>Abre esta página en <b>Chrome</b> o <b>Edge</b>.</li>
+          <li>En la barra de direcciones (a la derecha) busca el ícono de <b>instalar</b> <span class="kbd">⊕</span>.</li>
+          <li>Si no aparece, abre el menú <span class="kbd">⋮</span> → <b>Guardar y compartir → Instalar AdmiBrief</b> (en Edge: <b>Aplicaciones → Instalar este sitio como app</b>).</li>
+          <li>Pulsa <b>Instalar</b>. Se abrirá en su propia ventana y podrás fijarla a la barra de tareas.</li>
+        </ol>
+      </div>
+
+      <div class="info-card" id="notifCard">
+        <h3>Notificaciones</h3>
+        <p>Recibe un aviso cuando salgan noticias nuevas entre las más relevantes del día.</p>
+        <p class="notif-status" id="notifStatus"></p>
+        <div class="row-btns">
+          <button class="btn-primary" id="btnNotif">Activar notificaciones</button>
+          <button class="btn-ghost" id="btnNotifTest" hidden>Enviar prueba</button>
+        </div>
+        <p class="muted" id="notifHelp"></p>
+      </div>
+
+      <div class="info-card">
+        <h3>Noticias siempre al día</h3>
+        <p>El servidor revisa los medios <b>cada hora</b> y la app busca novedades al abrirla y cada pocos minutos mientras la usas. Las noticias nuevas aparecen marcadas con <b>Nueva</b>.</p>
+        <p>Toca el marcador dentro de una noticia para <b>guardarla</b> y leerla después, incluso sin conexión, en la pestaña <b>Guardados</b>.</p>
+      </div>
+    </section>
+
     <section id="viewInfo" class="view" hidden>
       <div class="view-head">
         <h2>Acerca de AdmiBrief</h2>
         <p>Lectura diaria de Perú y el mundo, pensada para futuros administradores.</p>
-      </div>
-      <div class="info-card" id="installCard">
-        <h3>Instalar como app</h3>
-        <p><b>Android (Chrome):</b> menú ⋮ → <b>Instalar app</b> o <b>Agregar a pantalla principal</b>.</p>
-        <p><b>iPhone (Safari):</b> botón Compartir → <b>Agregar a inicio</b>.</p>
-        <p><b>PC (Chrome o Edge):</b> ícono de instalar en la barra de direcciones, o menú → <b>Instalar AdmiBrief</b>.</p>
-        <button class="btn-primary" id="btnInstall" hidden>Instalar AdmiBrief</button>
       </div>
       <div class="info-card">
         <h3>Cómo funciona</h3>
@@ -116,6 +162,10 @@
   <button class="bb-item" data-view="viewSaved">
     <svg viewBox="0 0 24 24" width="22" height="22"><path d="M6 3h12v18l-6-4-6 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
     <span>Guardados</span><b class="badge" id="savedBadge" hidden>0</b>
+  </button>
+  <button class="bb-item" data-view="viewApp">
+    <svg viewBox="0 0 24 24" width="22" height="22"><rect x="7" y="2.5" width="10" height="19" rx="2.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.5 18.5h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span>App</span>
   </button>
   <button class="bb-item" data-view="viewInfo">
     <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>

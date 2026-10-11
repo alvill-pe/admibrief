@@ -29,13 +29,14 @@
   ];
   const secLabel = (id) => (SECTIONS.find((s) => s.id === id) || {}).label || '';
   const DATA_KEY = 'ab2_data', SAVED_KEY = 'ab2_saved', FONT_KEY = 'ab2_font', SEC_KEY = 'ab2_sec';
-  const REFRESH_MS = 15 * 60 * 1000;
+  const REFRESH_MS = 5 * 60 * 1000;
+  const SEEN_KEY = 'ab2_seen', NOTIF_KEY = 'ab2_notif';
   const desktop = window.matchMedia('(min-width: 1000px)');
 
   const state = {
     data: store.get(DATA_KEY, null), fetchedAt: 0, loading: false,
     section: store.get(SEC_KEY, 'top'), query: '', limit: 25,
-    saved: store.get(SAVED_KEY, {}), list: [], openId: null, font: store.get(FONT_KEY, 0)
+    saved: store.get(SAVED_KEY, {}), newIds: new Set(), list: [], openId: null, font: store.get(FONT_KEY, 0)
   };
   if (!SECTIONS.some((s) => s.id === state.section)) state.section = 'top';
 
@@ -50,6 +51,7 @@
       const changed = !state.data || state.data.generated !== data.generated;
       state.data = data; state.fetchedAt = Date.now();
       store.set(DATA_KEY, data);
+      if (changed) detectNew(data);
       if (changed) { renderList(); if (desktop.matches && !state.openId) openFirst(); }
       if (manual) toast(changed ? 'Noticias actualizadas' : 'Ya tienes lo más reciente');
     } catch (e) {
@@ -58,6 +60,85 @@
       state.loading = false; $('#btnRefresh').classList.remove('spin'); renderStatus(); renderInfo();
       if (!state.data) renderList();
     }
+  }
+
+  // ------------------------------------------------------------ novedades y avisos
+  function detectNew(data) {
+    const seenArr = store.get(SEEN_KEY, null);
+    const all = data.items || [];
+    if (seenArr) {
+      const seen = new Set(seenArr);
+      all.forEach((i) => { if (!seen.has(i.group || i.id)) state.newIds.add(i.group || i.id); });
+      if (state.newIds.size && store.get(NOTIF_KEY, false)) notifyNew(data, state.newIds);
+    }
+    store.set(SEEN_KEY, all.map((i) => i.group || i.id).slice(0, 400));
+    if (store.get(NOTIF_KEY, false)) syncSW();
+  }
+  async function showNote(title, body, id, tag) {
+    const opts = { body, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', tag: tag || 'admibrief', data: { id: id || '' }, renotify: true };
+    try {
+      const reg = 'serviceWorker' in navigator ? await navigator.serviceWorker.ready : null;
+      if (reg && reg.showNotification) return await reg.showNotification(title, opts);
+      new Notification(title, opts);
+    } catch (e) {}
+  }
+  function notifyNew(data, fresh) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    const top = (data.top || []).map((id) => data.items.find((i) => i.id === id)).filter((i) => i && fresh.has(i.group || i.id));
+    if (!top.length) return;
+    const first = top[0];
+    const more = top.length > 1 ? ' (+' + (top.length - 1) + ' destacadas más)' : '';
+    showNote('AdmiBrief · ' + secLabel((first.secs && first.secs[0]) || first.sec), first.title + more, first.id);
+  }
+  const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  const detectOS = () => {
+    const ua = navigator.userAgent;
+    if (/iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
+    if (/Android/i.test(ua)) return 'android';
+    return 'pc';
+  };
+  function showOS(os) {
+    document.querySelectorAll('#osTabs button').forEach((b) => b.classList.toggle('active', b.dataset.os === os));
+    document.querySelectorAll('.steps').forEach((o) => (o.hidden = o.dataset.os !== os));
+  }
+  function renderNotif() {
+    const st = $('#notifStatus'), btn = $('#btnNotif'), test = $('#btnNotifTest'), help = $('#notifHelp');
+    const os = detectOS();
+    if (!('Notification' in window)) {
+      st.textContent = 'Este navegador no admite notificaciones.'; st.className = 'notif-status bad'; btn.hidden = true; test.hidden = true;
+      help.textContent = os === 'ios' ? 'En iPhone/iPad (iOS 16.4 o superior) primero instala la app: Safari → Compartir → Agregar a inicio, y ábrela desde el ícono.' : '';
+      return;
+    }
+    const perm = Notification.permission, on = perm === 'granted' && store.get(NOTIF_KEY, false);
+    if (perm === 'denied') {
+      st.textContent = 'Bloqueadas en este navegador.'; st.className = 'notif-status bad'; btn.hidden = true; test.hidden = true;
+      help.textContent = 'Para activarlas, entra a los ajustes del sitio (ícono del candado junto a la dirección) y permite las notificaciones.'; return;
+    }
+    st.textContent = on ? 'Activadas: te avisaremos de las noticias más relevantes.' : 'Desactivadas.'; st.className = 'notif-status' + (on ? ' ok' : '');
+    btn.hidden = false; btn.textContent = on ? 'Desactivar notificaciones' : 'Activar notificaciones'; test.hidden = !on;
+    help.textContent = (os === 'ios' && !isStandalone() ? 'En iPhone las notificaciones solo funcionan con la app instalada en el inicio (iOS 16.4 o superior). ' : '') +
+      'Los avisos llegan cuando abres la app o la dejas abierta en segundo plano; en Chrome de Android y PC también se revisan novedades de vez en cuando aunque esté cerrada.';
+  }
+  async function toggleNotif() {
+    if (!('Notification' in window)) return;
+    if (store.get(NOTIF_KEY, false) && Notification.permission === 'granted') { store.set(NOTIF_KEY, false); renderNotif(); toast('Notificaciones desactivadas'); syncSW(); return; }
+    let perm = Notification.permission;
+    if (perm !== 'granted') { try { perm = await Notification.requestPermission(); } catch (e) {} }
+    if (perm === 'granted') {
+      store.set(NOTIF_KEY, true); toast('Notificaciones activadas'); registerPeriodic(); syncSW();
+      showNote('AdmiBrief', 'Listo. Te avisaremos de las noticias más relevantes.', '', 'welcome');
+    }
+    renderNotif();
+  }
+  function syncSW() {
+    if (!('serviceWorker' in navigator)) return;
+    navigator.serviceWorker.ready.then((r) => r.active && r.active.postMessage({ type: 'notif', on: !!store.get(NOTIF_KEY, false), seen: store.get(SEEN_KEY, []) })).catch(() => {});
+  }
+  async function registerPeriodic() {
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      if (reg.periodicSync) await reg.periodicSync.register('admibrief-news', { minInterval: 60 * 60 * 1000 });
+    } catch (e) {}
   }
 
   const items = () => (state.data && state.data.items) || [];
@@ -94,12 +175,13 @@
     const big = opts && opts.big;
     const rank = opts && opts.rank ? '<span class="rank">' + String(opts.rank).padStart(2, '0') + '</span>' : '';
     const sec = (i.secs && i.secs[0]) || i.sec;
+    const isNew = state.newIds.has(i.group || i.id) ? '<span class="new-tag">Nueva</span>' : '';
     const also = i.also && i.also.length ? '<span class="cov">+' + i.also.length + ' medios</span>' : '';
     const img = i.img ? '<div class="thumb"><img loading="lazy" referrerpolicy="no-referrer" src="' + esc(i.img) + '" alt="" onerror="this.parentNode.remove()"></div>' : '';
     return '<article class="card' + (big ? ' big' : '') + (i.id === state.openId ? ' current' : '') + '" data-id="' + i.id + '" tabindex="0" role="button" aria-label="' + esc(i.title) + '">' +
       (big ? img : '') +
       '<div class="card-main">' +
-        '<div class="meta">' + rank + '<span class="sec sec-' + sec + '">' + esc(secLabel(sec)) + '</span><span class="src">' + esc(i.source) + '</span><span class="dot">·</span><time>' + timeAgo(i.date) + '</time></div>' +
+        '<div class="meta">' + rank + '<span class="sec sec-' + sec + '">' + esc(secLabel(sec)) + '</span>' + isNew + '<span class="src">' + esc(i.source) + '</span><span class="dot">·</span><time>' + timeAgo(i.date) + '</time></div>' +
         '<h3 class="title">' + esc(i.title) + '</h3>' +
         '<p class="lead">' + esc(lead(i)) + '</p>' +
         '<div class="card-foot"><span class="concept"><i></i>' + esc(i.admin ? i.admin.concept : '') + '</span>' + also +
@@ -232,6 +314,7 @@
     document.body.classList.toggle('on-news', id === 'viewNews');
     if (id === 'viewSaved') renderSaved();
     if (id === 'viewInfo') renderInfo();
+    if (id === 'viewApp') renderNotif();
     if (!desktop.matches && location.hash.startsWith('#/n/')) history.back();
     window.scrollTo({ top: 0 });
   }
@@ -287,10 +370,19 @@
     let deferred;
     window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferred = e; $('#btnInstall').hidden = false; });
     $('#btnInstall').addEventListener('click', async () => { if (!deferred) return; deferred.prompt(); await deferred.userChoice; deferred = null; $('#btnInstall').hidden = true; });
-    if (window.matchMedia('(display-mode: standalone)').matches) $('#installCard').hidden = true;
+    window.addEventListener('appinstalled', () => { deferred = null; $('#btnInstall').hidden = true; renderInstall(); toast('AdmiBrief instalada'); });
+    showOS(detectOS());
+    $('#osTabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) showOS(b.dataset.os); });
+    function renderInstall() { $('#installNow').textContent = isStandalone() ? '✓ Ya estás usando AdmiBrief como app.' : 'Elige tu dispositivo y sigue los pasos (toma menos de un minuto).'; }
+    renderInstall();
+    $('#btnNotif').addEventListener('click', toggleNotif);
+    $('#btnNotifTest').addEventListener('click', () => showNote('AdmiBrief', 'Así se verán tus avisos de noticias relevantes.', '', 'test'));
+    if (store.get(NOTIF_KEY, false)) { registerPeriodic(); syncSW(); }
+    if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', (e) => { if (e.data && e.data.type === 'open') { location.hash = '#/n/' + e.data.id; } });
 
     document.addEventListener('visibilitychange', () => { if (!document.hidden && Date.now() - state.fetchedAt > REFRESH_MS) load(false); });
     setInterval(renderStatus, 60000);
+    setInterval(() => { if (!document.hidden || store.get(NOTIF_KEY, false)) load(false); }, REFRESH_MS);
 
     if (location.hash.startsWith('#/n/')) onHash();
     else if (desktop.matches && state.data) openFirst();

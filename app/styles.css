@@ -214,3 +214,19 @@ body.reading .bottombar { display: none; }
   .card.big .thumb { aspect-ratio: 16 / 7; }
 }
 @media (min-width: 1000px) and (prefers-color-scheme: dark) { .bb-item.active { color: #fff; } }
+
+/* ---- Instalar y notificaciones ---- */
+.seg { display: flex; gap: 4px; padding: 4px; background: var(--bg); border-radius: 10px; margin: 12px 0; }
+.seg button { flex: 1; height: 38px; border-radius: 8px; font-weight: 600; color: var(--ink-2); }
+.seg button.active { background: var(--surface); color: var(--accent); box-shadow: var(--shadow); }
+.steps { margin: 0; padding-left: 22px; display: grid; gap: 8px; line-height: 1.5; color: var(--ink-2); }
+.steps[hidden] { display: none; }
+.kbd { display: inline-block; min-width: 22px; padding: 0 6px; text-align: center; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); font-weight: 700; color: var(--ink); }
+.row-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn-ghost { height: 46px; border-radius: 10px; padding: 0 18px; margin-top: 6px; border: 1px solid var(--line); color: var(--accent); font-weight: 600; background: var(--surface); }
+.btn-ghost[hidden], .btn-primary[hidden] { display: none; }
+.notif-status { font-weight: 600; }
+.notif-status.ok { color: #1E8E4E; }
+.notif-status.bad { color: #C0392B; }
+.new-tag { font-size: 10.5px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; background: #E8F7EE; color: #1E8E4E; }
+@media (prefers-color-scheme: dark) { .new-tag { background: #12301F; color: #6FD59A; } }
