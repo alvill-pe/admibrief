@@ -1,0 +1,68 @@
+name: Actualizar noticias y publicar
+
+on:
+  schedule:
+    - cron: '23 * * * *'      # cada hora (minuto 23)
+  workflow_dispatch:           # botón "Run workflow" para actualizar a mano
+  push:
+    branches: [main]
+
+permissions:
+  contents: write              # solo para el commit de "mantener activo"
+  pages: write
+  id-token: write
+  models: read                 # modelos de IA gratuitos de GitHub (resúmenes redactados)
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Copiar la app
+        run: mkdir -p _site && cp -r app/. _site/
+
+      - name: Generar noticias y resúmenes
+        env:
+          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AI_MAX: '8'
+        run: node scripts/build-news.mjs _site
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+      # GitHub pausa las tareas programadas tras 60 días sin cambios en el repositorio.
+      # Este paso hace un commit mínimo cada ~45 días para que la app nunca deje de actualizarse.
+      - name: Mantener activo
+        if: github.event_name == 'schedule'
+        run: |
+          last=$(git log -1 --format=%ct)
+          now=$(date +%s)
+          if [ $(( (now - last) / 86400 )) -ge 45 ]; then
+            git config user.name "admibrief-bot"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            date -u +%FT%TZ > .keepalive
+            git add .keepalive
+            git commit -m "Mantener activa la actualizacion automatica [skip ci]"
+            git push
+          fi
