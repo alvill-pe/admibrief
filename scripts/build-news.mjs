@@ -18,6 +18,7 @@ import { fileURLToPath } from 'node:url';
 import { XMLParser } from 'fast-xml-parser';
 import * as cheerio from 'cheerio';
 import { FEEDS, EXCLUDE_URL, EXCLUDE_TITLE } from './feeds.mjs';
+import { buildMacro } from './macro.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT_DIR = path.resolve(process.argv[2] || path.join(ROOT, '_site'));
@@ -283,9 +284,9 @@ async function main() {
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
   // 1) noticias de la ejecución anterior (para acumular el día y reutilizar resúmenes)
-  let prev = { items: [] };
+  let prev = { items: [] }, prevMacro = null;
   if (SITE_URL && !FIXTURES) {
-    try { prev = await get(SITE_URL + 'news.json?t=' + NOW, { type: 'json' }); log('Anterior:', prev.items.length, 'notas'); if (prev.version !== DATA_VERSION) { log('Versión anterior distinta: se regenera todo'); prev = { items: [] }; } }
+    try { prev = await get(SITE_URL + 'news.json?t=' + NOW, { type: 'json' }); prevMacro = prev.macro || null; log('Anterior:', prev.items.length, 'notas'); if (prev.version !== DATA_VERSION) { log('Versión anterior distinta: se regenera todo'); prev = { items: [] }; } }
     catch (e) { log('Sin news.json anterior:', e.message); }
   }
   const prevById = new Map((prev.items || []).map((i) => [i.id, i]));
@@ -407,8 +408,12 @@ async function main() {
     top.push(it.id);
   }
 
+  // 10) indicadores del BCRP para el «Dato del Día»
+  let macro = null;
+  try { macro = await buildMacro(get, NOW, prevMacro); } catch (e) { log('Macro:', e.message); macro = prevMacro; }
+
   const items = fresh.slice(0, MAX_ITEMS).map(({ _full, iscore, ...rest }) => rest);
-  const out = { version: DATA_VERSION, generated: new Date(NOW).toISOString(), count: items.length, sources: sourceStatus.sort((a, b) => a.sec.localeCompare(b.sec)), top, items };
+  const out = { version: DATA_VERSION, generated: new Date(NOW).toISOString(), count: items.length, sources: sourceStatus.sort((a, b) => a.sec.localeCompare(b.sec)), top, macro, items };
   fs.writeFileSync(path.join(OUT_DIR, 'news.json'), JSON.stringify(out));
   const kb = Math.round(fs.statSync(path.join(OUT_DIR, 'news.json')).size / 1024);
   log(`news.json: ${items.length} notas, ${kb} KB, ${sourceStatus.filter((s) => s.ok).length}/${FEEDS.length} fuentes OK`);
