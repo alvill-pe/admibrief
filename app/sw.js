@@ -1,6 +1,6 @@
 /* AdmiBrief service worker: siempre intenta la versión más reciente y, sin conexión,
    abre lo último guardado. */
-const CACHE = 'admibrief-v10';
+const CACHE = 'admibrief-v11';
 const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'glossary.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 
@@ -19,7 +19,7 @@ self.addEventListener('fetch', (e) => {
   const font = /fonts\.(googleapis|gstatic)\.com$/.test(url.hostname);
   if (!same && !font) return; // imágenes de los medios: directo a la red
   // primero la red; si falla (sin conexión), lo guardado
-  e.respondWith(fetch(e.request).then((res) => {
+  e.respondWith(fetch(e.request, same ? { cache: 'no-cache' } : undefined).then((res) => {
     if (res.ok || res.type === 'opaque') { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(same ? url.pathname.replace(/^.*\/admibrief\//, '') || './' : e.request, copy)); }
     return res;
   }).catch(async () => {
