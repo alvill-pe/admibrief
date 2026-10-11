@@ -64,7 +64,7 @@
       area: 'Operaciones y logística', pestel: 'Económico / Tecnológico', concept: 'Cadena de suministro', w: 3,
       note: 'La logística define costos, tiempos de entrega e inventarios. Infraestructura y transporte pueden abrir mercados o crear cuellos de botella.',
       q: '¿Cómo cambiaría el costo y el tiempo de llevar un producto de tu región al mercado?' },
-    { k: ['el nino', 'fenomeno', 'lluvias', 'huaico', 'sequia', 'cambio climatico', 'clima', 'sismo', 'friaje', 'inundacion', 'emergencia'],
+    { k: ['el nino', 'fenomeno', 'lluvias', 'huaico', 'sequia', 'cambio climatico', 'clima', 'sismo', 'terremoto', 'temblor', 'huracan', 'tormenta', 'incendio forestal', 'incendios forestales', 'friaje', 'inundacion', 'damnificados'],
       area: 'Gestión de riesgos', pestel: 'Ecológico', concept: 'Continuidad del negocio', w: 2,
       note: 'Los eventos climáticos interrumpen producción, transporte y ventas. Las empresas preparadas tienen planes de contingencia y seguros.',
       q: '¿Qué plan de contingencia debería tener una empresa expuesta a este riesgo?' },
@@ -76,7 +76,7 @@
       area: 'Finanzas corporativas', pestel: 'Económico', concept: 'Mercado de capitales', w: 2,
       note: 'Los mercados reflejan expectativas sobre empresas y países. El riesgo país y las calificaciones encarecen o abaratan el financiamiento.',
       q: '¿Qué le dice este movimiento a una empresa que quiere emitir deuda?' },
-    { k: ['petroleo', 'combustible', 'gasolina', 'diesel', 'balon de gas', 'glp$', 'energia', 'electricidad', 'tarifa'],
+    { k: ['petroleo', 'combustible', 'gasolina', 'diesel', 'balon de gas', 'glp$', 'precio de la energia', 'tarifa electrica', 'tarifas electricas'],
       area: 'Costos y operaciones', pestel: 'Económico', concept: 'Estructura de costos', w: 2,
       note: 'Energía y combustibles impactan casi todos los costos (transporte, producción). Su variación se traslada a precios finales.',
       q: '¿En qué porcentaje de sus costos depende una empresa de transporte del combustible?' },
@@ -104,7 +104,7 @@
       area: 'Responsabilidad social', pestel: 'Ecológico / Social', concept: 'Sostenibilidad empresarial', w: 2,
       note: 'Clientes, inversionistas y reguladores exigen prácticas sostenibles. La RSE ya no es solo imagen: influye en costos, financiamiento y reputación.',
       q: '¿Qué indicador de sostenibilidad debería reportar una empresa de este sector?' },
-    { k: ['inseguridad', 'extorsion', 'delincuencia', 'criminalidad', 'sicariato', 'paro de transportistas', 'estado de emergencia'],
+    { k: ['inseguridad', 'extorsion', 'delincuencia', 'criminalidad', 'criminal', 'sicariato', 'sicario', 'banda', 'homicidio', 'asesinato', 'paro de transportistas', 'estado de emergencia'],
       area: 'Gestión de riesgos', pestel: 'Social / Político', concept: 'Seguridad y continuidad operativa', w: 2,
       note: 'La inseguridad eleva costos (vigilancia, seguros), reduce horarios de atención y afecta la confianza del consumidor.',
       q: '¿Qué medidas tomarías para proteger a trabajadores y clientes sin paralizar el negocio?' },
@@ -141,7 +141,7 @@
     for (const r of R) {
       let hits = 0;
       for (const re of r.re) {
-        if (re.test(t)) hits += 2;          // en el titular pesa más
+        if (re.test(t)) hits += 3;          // en el titular pesa más
         else if (re.test(all)) hits += 1;
       }
       if (hits) {

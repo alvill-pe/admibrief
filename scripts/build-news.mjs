@@ -30,7 +30,8 @@ const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 const NOW = Date.now();
 const HOUR = 3.6e6;
 const MAX_AGE_H = { peru: 36, pol: 36, eco: 48, world: 36, adm: 120 };
-const MAX_ITEMS = 260;
+const MAX_ITEMS = 220;
+const DATA_VERSION = 3; // si cambian las reglas, se descartan los datos anteriores
 
 // Motor de reglas compartido con la app
 vm.runInThisContext(fs.readFileSync(path.join(ROOT, 'scripts', 'insights.js'), 'utf8'));
@@ -94,7 +95,7 @@ function parseFeed(text, feed) {
       desc: htmlToText(txt(it.description) || txt(it.summary)),
       html, img
     };
-  }).filter((x) => x.title && /^https?:\/\//.test(x.link));
+  }).filter((x) => x.title && /^https?:\/\//.test(x.link)).sort((a, b) => b.date - a.date).slice(0, 30);
 }
 
 // ---------------------------------------------------------------- texto
@@ -216,6 +217,10 @@ function extractiveSummary(title, paras) {
 // ---------------------------------------------------------------- IA gratuita (GitHub Models)
 let aiDisabled = !AI_TOKEN || process.env.AI_OFF === '1';
 let aiUsed = 0, aiFails = 0;
+const AI_ENDPOINTS = [
+  { url: 'https://models.github.ai/inference/chat/completions', headers: { 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' } },
+  { url: 'https://models.inference.ai.azure.com/chat/completions', model: 'gpt-4o-mini' }
+];
 async function aiSummary(item, fullText) {
   if (aiDisabled || aiUsed >= AI_MAX) return null;
   aiUsed++;
@@ -233,15 +238,20 @@ MEDIO: ${item.source}
 NOTA:
 ${fullText.slice(0, 7000)}`;
   try {
-    const res = await fetch('https://models.github.ai/inference/chat/completions', {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + AI_TOKEN, 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ model: AI_MODEL, temperature: 0.3, max_tokens: 1100, response_format: { type: 'json_object' }, messages: [{ role: 'user', content: prompt }] })
-    });
-    if (res.status === 429 || res.status === 401 || res.status === 403) { aiDisabled = true; log('IA no disponible:', res.status, (await res.text()).slice(0, 200)); return null; }
-    if (!res.ok) { log('IA error', res.status); return null; }
-    const data = await res.json();
-    const j = JSON.parse(data.choices[0].message.content);
+    const mk = (model) => JSON.stringify({ model, temperature: 0.3, max_tokens: 1100, response_format: { type: 'json_object' }, messages: [{ role: 'user', content: prompt }] });
+    let data = null;
+    for (const ep of AI_ENDPOINTS) {
+      if (ep.bad) continue;
+      const res = await fetch(ep.url, { method: 'POST', body: mk(ep.model || AI_MODEL), headers: Object.assign({ 'Authorization': 'Bearer ' + AI_TOKEN, 'Content-Type': 'application/json' }, ep.headers || {}) });
+      const text = await res.text();
+      if (res.status === 429) { aiDisabled = true; log('IA: límite gratuito alcanzado'); return null; }
+      try { data = JSON.parse(text); } catch (e) { data = null; }
+      if (res.ok && data && data.choices) { if (!ep.logged) { log('IA OK vía', ep.url); ep.logged = true; } break; }
+      log('IA', ep.url, res.status, text.slice(0, 160).replace(/\s+/g, ' '));
+      ep.bad = true; data = null;
+    }
+    if (!data) { if (AI_ENDPOINTS.every((e) => e.bad)) aiDisabled = true; return null; }
+    const j = JSON.parse(data.choices[0].message.content.replace(/^```(json)?|```$/g, ''));
     const resumen = (j.resumen || []).map(cleanText).filter(Boolean);
     if (resumen.join(' ').split(' ').length < 120) return null;
     const a = j.admin || {};
@@ -258,6 +268,8 @@ const ADM_URL = /\/(empresas|management|emprendimiento|negocios|marketing|tecnol
 const ADM_TITLE = /\b(CEO|gerente|empresa|empresas|compañía|marca|emprend|mype|pyme|startup|inversión de|negocio|liderazgo|ventas|retail|consumidor|campaña)\b/i;
 
 const tokSet = (t) => new Set(words(t).filter((w) => w.length > 3));
+const storyToks = (i) => new Set([...words(i.title), ...words(((i.summary && i.summary[0]) || '').split(' ').slice(0, 35).join(' '))].filter((w) => w.length > 3));
+function sameStoryLoose(a, b) { let inter = 0; a.forEach((w) => { if (b.has(w)) inter++; }); return inter >= 6 && inter / Math.max(1, Math.min(a.size, b.size)) >= 0.33; }
 function sameStory(a, b) {
   let inter = 0; a.forEach((w) => { if (b.has(w)) inter++; });
   return inter >= 3 && inter / Math.max(1, Math.min(a.size, b.size)) >= 0.5;
@@ -270,7 +282,7 @@ async function main() {
   // 1) noticias de la ejecución anterior (para acumular el día y reutilizar resúmenes)
   let prev = { items: [] };
   if (SITE_URL && !FIXTURES) {
-    try { prev = await get(SITE_URL + 'news.json?t=' + NOW, { type: 'json' }); log('Anterior:', prev.items.length, 'notas'); }
+    try { prev = await get(SITE_URL + 'news.json?t=' + NOW, { type: 'json' }); log('Anterior:', prev.items.length, 'notas'); if (prev.version !== DATA_VERSION) { log('Versión anterior distinta: se regenera todo'); prev = { items: [] }; } }
     catch (e) { log('Sin news.json anterior:', e.message); }
   }
   const prevById = new Map((prev.items || []).map((i) => [i.id, i]));
@@ -322,9 +334,12 @@ async function main() {
     const ex = extractiveSummary(r.title, paras);
     if (!ex.paragraphs.length) return;
     const full = paras.filter((p) => !p.h).map((p) => p.t).join('\n');
-    const ins = analyzeNews(r.title, full.slice(0, 1500));
+    if (ex.paragraphs.join(' ').split(' ').length < 60) return; // demasiado corto para entenderse sin abrir la nota
+    const ins = analyzeNews(r.title, full.slice(0, 700));
+    const tIns = analyzeNews(r.title, '');
     let s2 = secs.slice();
-    if (!s2.includes('adm') && ((ADM_AREAS.has(ins.area) && ins.score >= 4) || ADM_URL.test(r.link) || (ADM_TITLE.test(r.title) && secs.includes('eco')))) s2.push('adm');
+    const noAdm = /(asesin|homicid|criminal|sicari|muert|fallec|terremoto|sismo|tembl|incendio|huracán|accidente|elecciones|ONPE|JNE)/i.test(r.title);
+    if (!s2.includes('adm') && !noAdm && (ADM_URL.test(r.link) || ADM_AREAS.has(tIns.area) || (ADM_TITLE.test(r.title) && (secs.includes('eco') || secs.includes('peru'))))) s2.push('adm');
     fresh.push({
       id, title: r.title, link: r.link, source: r.feed.name.replace(/ Tecnología$/, ''), secs: s2, sec: secs[0], date,
       img: /^https:\/\//.test(img || '') ? img : '',
@@ -344,24 +359,26 @@ async function main() {
 
   // 6) misma noticia en varios medios → cobertura
   const toks = fresh.map((i) => tokSet(i.title));
+  const stoks = fresh.map(storyToks);
   fresh.forEach((it, a) => {
     const others = new Set();
-    fresh.forEach((o, b) => { if (a !== b && o.source !== it.source && sameStory(toks[a], toks[b])) others.add(o.source); });
+    fresh.forEach((o, b) => { if (a !== b && o.source !== it.source && (sameStory(toks[a], toks[b]) || sameStoryLoose(stoks[a], stoks[b]))) others.add(o.source); });
     it.also = [...others];
   });
 
   // 7) relevancia
   fresh.forEach((it) => {
     const h = (NOW - it.date) / HOUR;
-    it.score = Math.round((Math.max(0, 14 - h / 1.6) + (it.iscore || 0) * 1.2 + it.also.length * 3.5 + Math.min(4, (it.words || 0) / 200) + (it.img ? 0.5 : 0)) * 10) / 10;
+    const routine = /(precio del d[oó]lar hoy|tipo de cambio hoy|temblor hoy|sismo hoy|clima hoy|hor[oó]scopo|resultados? (en vivo|al \d))/i.test(it.title) ? 7 : 0;
+    it.score = Math.round((-routine + Math.max(0, 14 - h / 1.6) + (it.iscore || 0) * 1.2 + it.also.length * 3.5 + Math.min(4, (it.words || 0) / 200) + (it.img ? 0.5 : 0)) * 10) / 10;
   });
   fresh.sort((a, b) => b.score - a.score);
   // grupo: la misma historia contada por varios medios comparte grupo (la app muestra solo una)
   const groups = [];
   fresh.forEach((it) => {
-    const t = tokSet(it.title);
-    const g = groups.find((x) => sameStory(x.t, t));
-    if (g) it.group = g.id; else { it.group = it.id; groups.push({ id: it.id, t }); }
+    const t = tokSet(it.title), st = storyToks(it);
+    const g = groups.find((x) => sameStory(x.t, t) || sameStoryLoose(x.st, st));
+    if (g) it.group = g.id; else { it.group = it.id; groups.push({ id: it.id, t, st }); }
   });
 
   // 8) resúmenes redactados con IA para las más relevantes (si hay acceso gratuito)
@@ -382,13 +399,13 @@ async function main() {
   const top = []; const perSec = {};
   for (const it of fresh) {
     if (top.length >= 25) break;
-    const s = it.secs[0]; if ((perSec[s] = (perSec[s] || 0) + 1) > 5) continue;
-    if (top.some((id) => { const o = fresh.find((x) => x.id === id); return o && sameStory(tokSet(o.title), tokSet(it.title)); })) continue;
+    const s = it.secs[0]; if ((perSec[s] = (perSec[s] || 0) + 1) > (s === 'world' ? 4 : 6)) continue;
+    if (top.some((id) => { const o = fresh.find((x) => x.id === id); return o && o.group === it.group; })) continue;
     top.push(it.id);
   }
 
   const items = fresh.slice(0, MAX_ITEMS).map(({ _full, iscore, ...rest }) => rest);
-  const out = { generated: new Date(NOW).toISOString(), count: items.length, sources: sourceStatus.sort((a, b) => a.sec.localeCompare(b.sec)), top, items };
+  const out = { version: DATA_VERSION, generated: new Date(NOW).toISOString(), count: items.length, sources: sourceStatus.sort((a, b) => a.sec.localeCompare(b.sec)), top, items };
   fs.writeFileSync(path.join(OUT_DIR, 'news.json'), JSON.stringify(out));
   const kb = Math.round(fs.statSync(path.join(OUT_DIR, 'news.json')).size / 1024);
   log(`news.json: ${items.length} notas, ${kb} KB, ${sourceStatus.filter((s) => s.ok).length}/${FEEDS.length} fuentes OK`);
