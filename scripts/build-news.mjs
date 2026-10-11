@@ -32,7 +32,7 @@ const NOW = Date.now();
 const HOUR = 3.6e6;
 const MAX_AGE_H = { peru: 36, pol: 36, eco: 48, world: 36, salud: 72, biz: 72 };
 const MAX_ITEMS = 280;
-const DATA_VERSION = 6; // si cambian las reglas, se descartan los datos anteriores
+const DATA_VERSION = 7; // si cambian las reglas, se descartan los datos anteriores
 
 // Motor de reglas compartido con la app
 vm.runInThisContext(fs.readFileSync(path.join(ROOT, 'scripts', 'insights.js'), 'utf8'));
