@@ -37,17 +37,12 @@ export const FEEDS = [
   { sec: 'biz', name: 'Fortune',         url: 'https://fortune.com/feed/', lang: 'en' },
 
   // ---------- Más fuentes confiables ----------
-  // Perú: periodismo de investigación y análisis económico
-  { sec: 'pol',   name: 'Perú21',          url: 'https://peru21.pe/arcio/rss/politica/' },
-  { sec: 'eco',   name: 'Perú21',          url: 'https://peru21.pe/arcio/rss/economia/' },
-  { sec: 'eco',   name: 'Semana Económica', url: 'https://semanaeconomica.com/feed' },
-  { sec: 'pol',   name: 'Ojo Público',     url: 'https://ojo-publico.com/rss.xml' },
+  // Perú: periodismo de investigación
   { sec: 'pol',   name: 'IDL-Reporteros',  url: 'https://www.idl-reporteros.pe/feed/' },
   // Mundo: agencias, organismos y medios internacionales de referencia
   { sec: 'world', name: 'DW',              url: 'https://rss.dw.com/xml/rss-sp-all' },
   { sec: 'world', name: 'France 24',       url: 'https://www.france24.com/es/rss' },
   { sec: 'world', name: 'ONU Noticias',    url: 'https://news.un.org/feed/subscribe/es/news/all/rss.xml' },
-  { sec: 'world', name: 'CNN en Español',  url: 'https://cnnespanol.cnn.com/feed/', serious: true },
   { sec: 'world', name: 'Al Jazeera',      url: 'https://www.aljazeera.com/xml/rss/all.xml', lang: 'en', serious: true },
   // Negocios y economía global
   { sec: 'biz',   name: 'El País Economía', url: 'https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/economia/portada', brief: true },
